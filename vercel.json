@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://newsforsvoi.ru/$1",
+      "permanent": true
+    }
+  ]
+}
