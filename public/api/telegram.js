@@ -1,22 +1,17 @@
-// ...existing code...
 const fs = require('fs');
 const path = require('path');
-
-if (process.env.NODE_ENV !== 'production') {
-  try { require('dotenv').config(); } catch (e) {}
-}
 
 const FILE = path.join('/tmp', 'news.json');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();
 
+  // тело уже распарсено Vercel (JSON)
   const body = req.body || {};
-  // Telegram может присылать message, channel_post, edited_channel_post и т.д.
   const msg = body.message || body.channel_post || body.edited_message || body.edited_channel_post;
   if (!msg) return res.status(200).json({ ok: true, note: 'no message' });
 
-  // Принять только посты из канала (при необходимости убрать проверку)
+  // принимаем посты из канала (если нужно — измените условие)
   const chatType = (msg.chat && msg.chat.type) || '';
   if (chatType !== 'channel' && !(msg.sender_chat && msg.sender_chat.type === 'channel')) {
     return res.status(200).json({ ok: true, note: 'ignored non-channel' });
@@ -34,12 +29,11 @@ module.exports = async (req, res) => {
       try { arr = JSON.parse(fs.readFileSync(FILE, 'utf8') || '[]'); } catch (e) { arr = []; }
     }
     arr.unshift(post);
-    if (arr.length > 200) arr = arr.slice(0, 200);
+    if (arr.length > 500) arr = arr.slice(0, 500);
     fs.writeFileSync(FILE, JSON.stringify(arr, null, 2), 'utf8');
     return res.status(200).json({ ok: true });
   } catch (err) {
-    console.error(err);
+    console.error('telegram handler error', err);
     return res.status(500).json({ error: 'internal' });
   }
 };
-// ...existing code...
