@@ -1,101 +1,187 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Новости для Своих — независимый Telegram-канал с честными новостями России и мира. Без фейков, без пропаганды — только правда и аналитика." />
-  <meta name="keywords" content="новости, новости России, телеграм новости, Новости для Своих, News SVOих, свежие новости, аналитика, события, независимые новости" />
-  <meta name="robots" content="index, follow" />
-  <title>Новости для Своих — независимые новости России и мира</title>
-  <link rel="icon" href="https://t.me/newsSVOih" />
+  <meta charset="UTF-8">
+  <title>Новости для СВОИХ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
-      color: #222;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f3f4f6;
       margin: 0;
       padding: 0;
+      color: #111;
     }
+
+    /* ---------------- Шапка ---------------- */
     header {
-      background-color: #0046ff;
-      color: white;
+      position: relative;
+      width: 100%;
+      height: 220px;
+      overflow: hidden;
+    }
+
+    header img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .banner-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5); /* тёмный оверлей */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       text-align: center;
-      padding: 2rem 1rem;
-    }
-    h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0.3rem;
-    }
-    h2 {
-      font-size: 1.2rem;
-      font-weight: normal;
-      color: #d6e0ff;
-    }
-    main {
-      max-width: 800px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    p {
-      line-height: 1.7;
-      margin-bottom: 1rem;
-    }
-    ul {
-      margin-left: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    a.button {
-      display: inline-block;
-      background: #0046ff;
       color: white;
-      text-decoration: none;
+      padding: 0 20px;
+    }
+
+    .banner-overlay h1 {
+      font-size: 36px;
+      margin: 0 0 10px 0;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+    }
+
+    .banner-overlay p {
+      font-size: 16px;
+      max-width: 800px;
+      line-height: 1.4;
+      margin-bottom: 15px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    .telegram-button {
+      display: inline-block;
+      padding: 12px 25px;
+      background-color: #0088cc;
+      color: white;
       font-weight: bold;
-      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .telegram-button:hover {
+      background-color: #006699;
+    }
+
+    /* ---------------- Контент ---------------- */
+    .news-container {
+      max-width: 800px;
+      margin: 20px auto 40px;
+      padding: 0 20px;
+    }
+
+    .post {
+      background: white;
+      padding: 16px;
+      margin-bottom: 12px;
       border-radius: 10px;
-      transition: background 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      transition: 0.2s ease;
     }
-    a.button:hover {
-      background: #002fd1;
+
+    .post:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+
+    .text {
+      font-size: 16px;
+      white-space: pre-wrap;
+    }
+
+    .date {
+      color: gray;
+      font-size: 13px;
+      text-align: right;
+      margin-top: 8px;
+    }
+
     footer {
       text-align: center;
-      font-size: 0.9rem;
-      color: #666;
-      padding: 1rem 0 2rem;
+      color: gray;
+      font-size: 14px;
+      padding: 20px 0;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: gray;
     }
   </style>
 </head>
 <body>
+
+  <!-- ---------------- Шапка ---------------- -->
   <header>
-    <h1>Новости для Своих</h1>
-    <h2>Честные новости России и мира</h2>
+    <div class="banner-overlay">
+      <h1>Новости для СВОИХ</h1>
+      <p>Актуальные новости России и мира без фейков и лишнего шума. Главные события, аналитика, обзоры и факты — коротко и по делу.<br>
+      Читайте свежие новости, политические и военные сводки, новости экономики, технологий и общества.</p>
+      <a class="telegram-button" href="https://t.me/newsSVOih" target="_blank">
+        Перейти в Telegram-канал
+      </a>
+    </div>
+    <img src="/channel-banner.jpg" alt="Новости для СВОИХ">
   </header>
 
-  <main>
-    <p><strong>Новости для Своих</strong> — это независимый Telegram-канал о событиях в России и мире. 
-    Каждый день мы публикуем свежие новости, мнения, факты и аналитику без фейков и пропаганды. 
-    Наши материалы помогают понять, что происходит на самом деле — коротко, честно и по делу. 
-    Читайте и подписывайтесь 👉 
-    <a href="https://t.me/newsSVOih" target="_blank">https://t.me/newsSVOih</a></p>
-
-    <p>На канале вы найдёте:</p>
-    <ul>
-      <li>🗞 актуальные новости и репортажи,</li>
-      <li>📊 честную аналитику и мнения экспертов,</li>
-      <li>🎥 материалы с места событий,</li>
-      <li>💬 комментарии без цензуры.</li>
-    </ul>
-
-    <p style="text-align:center; margin-top:2rem;">
-      <a href="https://t.me/newsSVOih" class="button" target="_blank">Перейти в Telegram-канал</a>
-    </p>
-  </main>
+  <!-- ---------------- Контейнер для новостей ---------------- -->
+  <div class="news-container" id="news">
+    <div class="loading">Загрузка новостей...</div>
+  </div>
 
   <footer>
-    © 2025 Новости для Своих | <a href="https://t.me/newsSVOih" target="_blank">t.me/newsSVOih</a>
+    <p>© Новости для СВОИХ — <a href="https://t.me/newsSVOih" target="_blank">наш Telegram-канал</a></p>
   </footer>
+
+  <!-- ---------------- Скрипт новостей ---------------- -->
+  <script>
+    const newsContainer = document.getElementById('news');
+
+    async function loadNews() {
+      try {
+        const res = await fetch('/news.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP error ' + res.status);
+        const posts = await res.json();
+
+        newsContainer.innerHTML = '';
+
+        if (!Array.isArray(posts) || posts.length === 0) {
+          newsContainer.innerHTML = '<p class="loading">Пока нет новостей 😔</p>';
+          return;
+        }
+
+        posts.forEach(p => {
+          const text = typeof p.text === 'string' ? p.text : '';
+          const dateStr = p.date ? new Date(p.date).toLocaleString('ru-RU') : '';
+          const div = document.createElement('div');
+          div.className = 'post';
+          div.innerHTML = `<div class="text">${text}</div><div class="date">${dateStr}</div>`;
+          newsContainer.appendChild(div);
+        });
+      } catch (err) {
+        console.error('Ошибка загрузки новостей:', err);
+        newsContainer.innerHTML = '<p class="loading">Ошибка загрузки новостей 😔</p>';
+      }
+    }
+
+    // Первая загрузка
+    loadNews();
+
+    // Автообновление каждые 60 секунд
+    setInterval(loadNews, 60000);
+  </script>
+
 </body>
 </html>
