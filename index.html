@@ -3,68 +3,117 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Новости для Своих — независимый Telegram-канал с честными новостями России и мира. Без фейков, без пропаганды — только правда и аналитика." />
-  <meta name="keywords" content="новости, новости России, телеграм новости, Новости для Своих, News SVOих, свежие новости, аналитика, события, независимые новости" />
-  <meta name="robots" content="index, follow" />
+  
+  <!-- SEO мета-теги -->
+  <meta name="description" content="Новости для своих — главные события России и мира без фейков и лишнего шума. Читайте свежие новости, аналитику и обзоры.">
+  <meta name="keywords" content="новости, Россия, мир, новости без фейков, политика, аналитика, обзоры, события">
+  <meta name="author" content="Новости для СВОИХ">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph для соцсетей -->
+  <meta property="og:title" content="Новости для СВОИХ — Актуальные новости России и мира">
+  <meta property="og:description" content="Новости без фейков и лишнего шума. Только факты.">
+  <meta property="og:image" content="https://newsforsvoi.ru/preview.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://newsforsvoi.ru/">
+
   <title>Новости для Своих — независимые новости России и мира</title>
   <link rel="icon" href="https://t.me/newsSVOih" />
+
   <style>
+    /* Общие стили */
     body {
       font-family: "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
-      color: #222;
       margin: 0;
       padding: 0;
+      color: #222;
+      background: url("channel-banner.jpg") center center / cover no-repeat fixed;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
+
+    /* Шапка сайта в милитари-стиле */
     header {
-      background-color: #0046ff;
+      background: linear-gradient(135deg, #556B2F, #3C3B32);
       color: white;
       text-align: center;
-      padding: 2rem 1rem;
+      padding: 3rem 1rem 2rem;
+      border-bottom: 4px solid #2F4F4F;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
+
     h1 {
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
+
     h2 {
       font-size: 1.2rem;
       font-weight: normal;
-      color: #d6e0ff;
+      color: #d8e0d8;
     }
+
+    /* Основной блок */
     main {
       max-width: 800px;
-      margin: 2rem auto;
-      background: white;
+      margin: 3rem auto;
+      background: rgba(255, 255, 255, 0.9);
       padding: 2rem;
       border-radius: 16px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      flex: 1;
+      animation: fadeIn 1s ease;
     }
+
     p {
       line-height: 1.7;
       margin-bottom: 1rem;
+      font-size: 1.1rem;
     }
-    ul {
-      margin-left: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
+
+    /* Кнопка перехода */
     a.button {
       display: inline-block;
-      background: #0046ff;
+      background: #3C3B32;
       color: white;
       text-decoration: none;
       font-weight: bold;
-      padding: 12px 20px;
+      padding: 14px 28px;
       border-radius: 10px;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.2s ease;
+      font-size: 1.1rem;
+      margin-top: 1rem;
     }
+
     a.button:hover {
-      background: #002fd1;
+      background: #556B2F;
+      transform: scale(1.03);
     }
+
+    /* Подвал */
     footer {
       text-align: center;
       font-size: 0.9rem;
-      color: #666;
-      padding: 1rem 0 2rem;
+      color: #ddd;
+      padding: 2rem 0;
+      background: rgba(0, 0, 0, 0.6);
+      margin-top: auto;
+    }
+
+    /* Анимация появления */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.8rem; }
+      h2 { font-size: 1rem; }
+      main { margin: 2rem 1rem; padding: 1.5rem; }
     }
   </style>
 </head>
@@ -75,27 +124,13 @@
   </header>
 
   <main>
-    <p><strong>Новости для Своих</strong> — это независимый Telegram-канал о событиях в России и мире. 
-    Каждый день мы публикуем свежие новости, мнения, факты и аналитику без фейков и пропаганды. 
-    Наши материалы помогают понять, что происходит на самом деле — коротко, честно и по делу. 
-    Читайте и подписывайтесь 👉 
-    <a href="https://t.me/newsSVOih" target="_blank">https://t.me/newsSVOih</a></p>
+    <p><strong>Новости для Своих</strong> — это независимый Telegram-канал о событиях в России и мире. Каждый день мы публикуем свежие новости, мнения и аналитику без фейков и пропаганды. Коротко, честно и по делу.</p>
 
-    <p>На канале вы найдёте:</p>
-    <ul>
-      <li>🗞 актуальные новости и репортажи,</li>
-      <li>📊 честную аналитику и мнения экспертов,</li>
-      <li>🎥 материалы с места событий,</li>
-      <li>💬 комментарии без цензуры.</li>
-    </ul>
-
-    <p style="text-align:center; margin-top:2rem;">
-      <a href="https://t.me/newsSVOih" class="button" target="_blank">Перейти в Telegram-канал</a>
-    </p>
+    <a href="https://t.me/newsSVOih" class="button" target="_blank">Перейти в Telegram-канал</a>
   </main>
 
   <footer>
-    © 2025 Новости для Своих | <a href="https://t.me/newsSVOih" target="_blank">t.me/newsSVOih</a>
+    © 2025 Новости для Своих
   </footer>
 </body>
 </html>
