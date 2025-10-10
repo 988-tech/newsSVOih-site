@@ -1,13 +1,12 @@
-
-        
 import os
 import time
 import telebot
 from datetime import datetime
-import pytz  # ⏰ добавляем поддержку часовых поясов
+import pytz
 
+# Загружаем токен из переменных окружения
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-CHANNEL_ID = "@newsSVOih"
+CHANNEL_ID = "@newsSVOih"  # название канала с @
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -48,11 +47,9 @@ def format_post(message):
         html += f"</video>\n"
         html += f"<p>{caption}</p>\n"
 
-    # 🕒 Добавляем московское время
     moscow_tz = pytz.timezone("Europe/Moscow")
     timestamp = datetime.fromtimestamp(message.date, moscow_tz).strftime("%d.%m.%Y %H:%M")
     html += f"<p class='timestamp'>🕒 {timestamp}</p>\n"
-
     html += f"<a href='https://t.me/newsSVOih/{message.message_id}' target='_blank'>Читать в Telegram</a>\n"
     html += f"<p class='source'>Источник: {message.chat.title}</p>\n"
     html += "</article>\n"
