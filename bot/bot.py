@@ -3,6 +3,7 @@ import telebot
 import pytz
 from datetime import datetime
 from dotenv import load_dotenv
+import subprocess
 
 load_dotenv()
 
@@ -15,7 +16,7 @@ def fetch_latest_posts():
     updates = bot.get_updates()
     posts = []
     for update in updates:
-        if update.message and update.message.chat and update.message.chat.username == CHANNEL:
+        if update.message:
             posts.append(update.message)
     return posts[-10:]  # последние 10 постов
 
@@ -46,6 +47,20 @@ def format_post(post):
     </div>
     """
 
+def wrap_html(content):
+    return f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Новости</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Последние новости</h1>
+  {content}
+</body>
+</html>"""
+
 def generate_sitemap():
     now = datetime.now().strftime("%Y-%m-%d")
     sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -67,20 +82,28 @@ def generate_sitemap():
     with open("public/sitemap.xml", "w", encoding="utf-8") as f:
         f.write(sitemap)
 
+def git_push():
+    subprocess.run(["git", "add", "public/news.html", "public/sitemap.xml"])
+    subprocess.run(["git", "commit", "-m", "Update news"])
+    subprocess.run(["git", "push"])
+
 def main():
     posts = fetch_latest_posts()
     os.makedirs("public", exist_ok=True)
 
     generate_sitemap()
 
+    html_content = ""
+    if not posts:
+        html_content = f"<p>Нет новых постов — {datetime.now()}</p>"
+    else:
+        for post in reversed(posts):
+            html_content += format_post(post)
+
     with open("public/news.html", "w", encoding="utf-8") as f:
-        if not posts:
-            f.write(f"<p>Нет новых постов — {datetime.now()}</p>")
-        else:
-            for post in reversed(posts):
-                f.write(format_post(post))
+        f.write(wrap_html(html_content))
+
+    git_push()
 
 if __name__ == "__main__":
     main()
-
-
