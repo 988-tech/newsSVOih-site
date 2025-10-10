@@ -63,11 +63,12 @@ def main():
         if not posts:
             f.write(f"<p>Нет новых постов — {datetime.now()}</p>")
         else:
-            for post in posts:
-                f.write(format_post(post))
+            for post in reversed(posts):
+    f.write(format_post(post))
 
 if __name__ == "__main__":
     main()
+
 
 
 
