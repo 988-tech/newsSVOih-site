@@ -7,17 +7,17 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-CHANNEL = os.getenv("TELEGRAM_CHANNEL")
+CHANNEL = os.getenv("TELEGRAM_CHANNEL")  # без @
 
 bot = telebot.TeleBot(TOKEN)
 
 def fetch_latest_posts():
-    try:
-        posts = bot.get_chat_history(CHANNEL, limit=10)
-        return posts
-    except Exception as e:
-        print("Ошибка при получении постов:", e)
-        return []
+    updates = bot.get_updates()
+    posts = []
+    for update in updates:
+        if update.message and update.message.chat and update.message.chat.username == CHANNEL:
+            posts.append(update.message)
+    return posts[-10:]  # последние 10 постов
 
 def format_post(post):
     moscow = pytz.timezone("Europe/Moscow")
@@ -82,14 +82,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
 
 
