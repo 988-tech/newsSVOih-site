@@ -1,4 +1,4 @@
-import os
+mport os
 import time
 import telebot
 from datetime import datetime
@@ -24,14 +24,27 @@ def fetch_latest_posts():
 
 def format_post(message):
     html = "<article class='news-item'>\n"
+
     if message.content_type == 'text':
         html += f"<p>{clean_text(message.text)}</p>\n"
+
     elif message.content_type == 'photo':
         file_info = bot.get_file(message.photo[-1].file_id)
         file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
         caption = clean_text(message.caption or "")
         html += f"<img src='{file_url}' alt='Фото' />\n"
         html += f"<p>{caption}</p>\n"
+
+    elif message.content_type == 'video':
+        file_info = bot.get_file(message.video.file_id)
+        file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
+        caption = clean_text(message.caption or "")
+        html += f"<video controls width='640'>\n"
+        html += f"  <source src='{file_url}' type='video/mp4'>\n"
+        html += f"  Ваш браузер не поддерживает видео.\n"
+        html += f"</video>\n"
+        html += f"<p>{caption}</p>\n"
+
     html += f"<a href='https://t.me/newsSVOih/{message.message_id}' target='_blank'>Читать в Telegram</a>\n"
     html += f"<p class='source'>Источник: {message.chat.title}</p>\n"
     html += "</article>\n"
@@ -49,6 +62,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
