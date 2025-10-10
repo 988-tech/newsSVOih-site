@@ -2,7 +2,7 @@ import os
 import time
 import telebot
 from datetime import datetime
-import pytz  # ⏰ добавляем поддержку часовых поясов
+import pytz
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHANNEL_ID = "@newsSVOih"
@@ -10,7 +10,20 @@ CHANNEL_ID = "@newsSVOih"
 bot = telebot.TeleBot(TOKEN)
 
 def clean_text(text):
-    return text.replace("https://t.me/newsSVOih", "").strip()
+    if not text:
+        return ""
+    text = text.replace("https://t.me/newsSVOih", "").strip()
+
+    # Удаляем повторяющиеся хвостовые подписи
+    unwanted_phrases = [
+        "💪Подписаться на новости для своих🇷🇺",
+        "Подписаться на новости для своих🇷🇺",
+        "Подписаться на канал",
+        "Читайте нас в Telegram",
+    ]
+    for phrase in unwanted_phrases:
+        text = text.replace(phrase, "")
+    return text.strip()
 
 def fetch_latest_posts():
     bot.remove_webhook()
@@ -61,7 +74,7 @@ def main():
         if not posts:
             f.write(f"<p>Нет новых постов — {datetime.now()}</p>")
         else:
-            for post in reversed(posts):  # 🔁 новые посты сверху
+            for post in reversed(posts):  # новые посты сверху
                 f.write(format_post(post))
 
 if __name__ == "__main__":
