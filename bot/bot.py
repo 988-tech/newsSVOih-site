@@ -11,6 +11,7 @@ def clean_text(text):
     return text.replace("https://t.me/newsSVOih", "").strip()
 
 def fetch_latest_posts():
+    bot.remove_webhook()  # 🔧 Отключаем webhook перед polling
     updates = bot.get_updates()
     posts = [
         u.channel_post
@@ -44,7 +45,6 @@ def main():
             for post in posts:
                 f.write(format_post(post))
 
-# ✅ ВАЖНО: правильная форма запуска
 if __name__ == "__main__":
     main()
 
