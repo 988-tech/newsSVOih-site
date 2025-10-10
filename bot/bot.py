@@ -41,3 +41,8 @@ def main():
         else:
             for post in posts:
                 f.write(format_post(post))
+
+# ✅ ВОТ ЭТА СТРОКА — правильная
+if name == "main":
+    main()
+
