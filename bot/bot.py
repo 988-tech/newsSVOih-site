@@ -2,11 +2,10 @@ import os
 import time
 import telebot
 from datetime import datetime
-import pytz
+import pytz  # ⏰ добавляем поддержку часовых поясов
 
-# Загружаем токен из переменных окружения
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-CHANNEL_ID = "@newsSVOih"  # название канала с @
+CHANNEL_ID = "@newsSVOih"
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -62,7 +61,7 @@ def main():
         if not posts:
             f.write(f"<p>Нет новых постов — {datetime.now()}</p>")
         else:
-            for post in posts:
+            for post in reversed(posts):  # 🔁 новые посты сверху
                 f.write(format_post(post))
 
 if __name__ == "__main__":
