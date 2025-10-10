@@ -13,7 +13,7 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
       with:
-        persist-credentials: false  # 🔥 ВАЖНО: отключает github-actions[bot]
+        persist-credentials: false  # 🔥 отключает github-actions[bot]
 
     - name: Set up Python
       uses: actions/setup-python@v4
