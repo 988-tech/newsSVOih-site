@@ -44,8 +44,10 @@ def main():
             for post in posts:
                 f.write(format_post(post))
 
+# ✅ ВАЖНО: правильная форма запуска
 if name == "main":
     main()
+
 
 
 
