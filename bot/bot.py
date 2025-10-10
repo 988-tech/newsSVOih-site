@@ -6,6 +6,7 @@ import pytz
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHANNEL_ID = "@newsSVOih"
+SEEN_IDS_FILE = "seen_ids.txt"
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -14,10 +15,9 @@ def clean_text(text):
         return ""
     text = text.replace("https://t.me/newsSVOih", "").strip()
 
-    # Удаляем повторяющиеся хвостовые подписи
     unwanted_phrases = [
         "💪Подписаться на новости для своих🇷🇺",
-        "Подписаться на новости для своих🇷🇺",
+        "Подписаться на новости для своих🇷🇷",
         "Подписаться на канал",
         "Читайте нас в Telegram",
     ]
@@ -67,27 +67,45 @@ def format_post(message):
     html += "</article>\n"
     return html
 
+def load_seen_ids():
+    if not os.path.exists(SEEN_IDS_FILE):
+        return set()
+    with open(SEEN_IDS_FILE, "r") as f:
+        return set(line.strip() for line in f)
+
+def save_seen_ids(ids):
+    with open(SEEN_IDS_FILE, "a") as f:
+        for id in ids:
+            f.write(f"{id}\n")
+
 def main():
     posts = fetch_latest_posts()
+    seen_ids = load_seen_ids()
+    new_posts = [p for p in posts if str(p.message_id) not in seen_ids]
+
+    if not new_posts:
+        print("Нет новых постов.")
+        return
+
     os.makedirs("public", exist_ok=True)
 
-    # Читаем старый контент
     old_content = ""
     if os.path.exists("public/news.html"):
         with open("public/news.html", "r", encoding="utf-8") as f:
             old_content = f.read()
 
-    # Генерируем новые посты
     new_content = ""
-    for post in reversed(posts):  # новые посты сверху
+    new_ids = []
+    for post in reversed(new_posts):  # новые посты сверху
         new_content += format_post(post)
+        new_ids.append(str(post.message_id))
 
-    # Объединяем: новые сверху, старые снизу
     full_content = new_content + old_content
 
-    # Записываем всё обратно
     with open("public/news.html", "w", encoding="utf-8") as f:
         f.write(full_content)
+
+    save_seen_ids(new_ids)
 
 if __name__ == "__main__":
     main()
