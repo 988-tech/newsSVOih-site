@@ -1,5 +1,6 @@
 import os
 import telebot
+from datetime import datetime
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHANNEL_ID = "@newsSVOih"
@@ -12,7 +13,7 @@ def clean_text(text):
 def fetch_latest_posts():
     updates = bot.get_updates()
     posts = [u.channel_post for u in updates if u.channel_post and u.channel_post.chat.username == CHANNEL_ID[1:]]
-    return posts[-5:]  # последние 5 постов
+    return posts[-5:]
 
 def format_post(message):
     html = "<article class='news-item'>\n"
@@ -35,5 +36,11 @@ def format_post(message):
 def main():
     posts = fetch_latest_posts()
     with open("public/news.html", "w", encoding="utf-8") as f:
-        for post in posts:
-            f.write(format_post(post))
+        if not posts:
+            f.write(f"<p>Нет новых постов — {datetime.now()}</p>")
+        else:
+            for post in posts:
+                f.write(format_post(post))
+
+if name == "main":
+    main()
