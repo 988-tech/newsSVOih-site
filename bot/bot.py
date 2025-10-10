@@ -70,12 +70,24 @@ def format_post(message):
 def main():
     posts = fetch_latest_posts()
     os.makedirs("public", exist_ok=True)
+
+    # Читаем старый контент
+    old_content = ""
+    if os.path.exists("public/news.html"):
+        with open("public/news.html", "r", encoding="utf-8") as f:
+            old_content = f.read()
+
+    # Генерируем новые посты
+    new_content = ""
+    for post in reversed(posts):  # новые посты сверху
+        new_content += format_post(post)
+
+    # Объединяем: новые сверху, старые снизу
+    full_content = new_content + old_content
+
+    # Записываем всё обратно
     with open("public/news.html", "w", encoding="utf-8") as f:
-        if not posts:
-            f.write(f"<p>Нет новых постов — {datetime.now()}</p>")
-        else:
-            for post in reversed(posts):  # новые посты сверху
-                f.write(format_post(post))
+        f.write(full_content)
 
 if __name__ == "__main__":
     main()
