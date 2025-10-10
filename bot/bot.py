@@ -41,6 +41,3 @@ def main():
         else:
             for post in posts:
                 f.write(format_post(post))
-
-if name == "main":
-    main()
