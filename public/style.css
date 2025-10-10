@@ -87,9 +87,59 @@ footer {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Новости */
+.news-item {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  text-align: left;
+  animation: fadeIn 0.6s ease;
+}
+
+.news-item p {
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+}
+
+/* Фото и видео */
+.news-item img,
+.news-item video {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* Время публикации */
+.timestamp {
+  font-size: 0.9rem;
+  color: #777;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+/* Ссылка на Telegram */
+.news-item a {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #3C3B32;
+  text-decoration: underline;
+}
+
+/* Источник */
+.source {
+  font-size: 0.85rem;
+  color: #999;
+  margin-top: 0.3rem;
+}
+
 /* Адаптив */
 @media (max-width: 600px) {
   h1 { font-size: 1.8rem; }
   h2 { font-size: 1rem; }
   main { margin: 2rem 1rem; padding: 1.5rem; }
+  .news-item { padding: 1rem; }
 }
