@@ -1,7 +1,8 @@
-mport os
+import os
 import time
 import telebot
 from datetime import datetime
+import pytz  # ⏰ добавляем поддержку часовых поясов
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHANNEL_ID = "@newsSVOih"
@@ -13,7 +14,7 @@ def clean_text(text):
 
 def fetch_latest_posts():
     bot.remove_webhook()
-    time.sleep(1)  # 🔧 даём Telegram время отключить webhook
+    time.sleep(1)
     updates = bot.get_updates()
     posts = [
         u.channel_post
@@ -45,6 +46,11 @@ def format_post(message):
         html += f"</video>\n"
         html += f"<p>{caption}</p>\n"
 
+    # 🕒 Добавляем московское время
+    moscow_tz = pytz.timezone("Europe/Moscow")
+    timestamp = datetime.fromtimestamp(message.date, moscow_tz).strftime("%d.%m.%Y %H:%M")
+    html += f"<p class='timestamp'>🕒 {timestamp}</p>\n"
+
     html += f"<a href='https://t.me/newsSVOih/{message.message_id}' target='_blank'>Читать в Telegram</a>\n"
     html += f"<p class='source'>Источник: {message.chat.title}</p>\n"
     html += "</article>\n"
@@ -62,6 +68,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
