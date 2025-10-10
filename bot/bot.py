@@ -1,73 +1,88 @@
 import os
-import time
 import telebot
+import pytz
 from datetime import datetime
-import pytz  # ⏰ добавляем поддержку часовых поясов
+from dotenv import load_dotenv
+
+load_dotenv()
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-CHANNEL_ID = "@newsSVOih"
+CHANNEL = os.getenv("TELEGRAM_CHANNEL")
 
 bot = telebot.TeleBot(TOKEN)
 
-def clean_text(text):
-    return text.replace("https://t.me/newsSVOih", "").strip()
-
 def fetch_latest_posts():
-    bot.remove_webhook()
-    time.sleep(1)
-    updates = bot.get_updates()
-    posts = [
-        u.channel_post
-        for u in updates
-        if u.channel_post and u.channel_post.chat.username == CHANNEL_ID[1:]
-    ]
-    return posts[-5:] if posts else []
+    try:
+        posts = bot.get_chat_history(CHANNEL, limit=10)
+        return posts
+    except Exception as e:
+        print("Ошибка при получении постов:", e)
+        return []
 
-def format_post(message):
-    html = "<article class='news-item'>\n"
+def format_post(post):
+    moscow = pytz.timezone("Europe/Moscow")
+    timestamp = datetime.fromtimestamp(post.date, tz=moscow).strftime("%d.%m.%Y %H:%M")
 
-    if message.content_type == 'text':
-        html += f"<p>{clean_text(message.text)}</p>\n"
+    text = post.text or ""
+    media = ""
 
-    elif message.content_type == 'photo':
-        file_info = bot.get_file(message.photo[-1].file_id)
+    if post.photo:
+        file_id = post.photo[-1].file_id
+        file_info = bot.get_file(file_id)
         file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-        caption = clean_text(message.caption or "")
-        html += f"<img src='{file_url}' alt='Фото' />\n"
-        html += f"<p>{caption}</p>\n"
-
-    elif message.content_type == 'video':
-        file_info = bot.get_file(message.video.file_id)
+        media = f'<img src="{file_url}" alt="Фото"><br>'
+    elif post.video:
+        file_id = post.video.file_id
+        file_info = bot.get_file(file_id)
         file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-        caption = clean_text(message.caption or "")
-        html += f"<video controls width='640'>\n"
-        html += f"  <source src='{file_url}' type='video/mp4'>\n"
-        html += f"  Ваш браузер не поддерживает видео.\n"
-        html += f"</video>\n"
-        html += f"<p>{caption}</p>\n"
+        media = f'<video controls src="{file_url}"></video><br>'
 
-    # 🕒 Добавляем московское время
-    moscow_tz = pytz.timezone("Europe/Moscow")
-    timestamp = datetime.fromtimestamp(message.date, moscow_tz).strftime("%d.%m.%Y %H:%M")
-    html += f"<p class='timestamp'>🕒 {timestamp}</p>\n"
+    return f"""
+    <div class="news-item">
+      {media}
+      <p>{text}</p>
+      <div class="timestamp">Опубликовано: {timestamp}</div>
+      <a href="https://t.me/{CHANNEL}/{post.message_id}">Открыть в Telegram</a>
+    </div>
+    """
 
-    html += f"<a href='https://t.me/newsSVOih/{message.message_id}' target='_blank'>Читать в Telegram</a>\n"
-    html += f"<p class='source'>Источник: {message.chat.title}</p>\n"
-    html += "</article>\n"
-    return html
+def generate_sitemap():
+    now = datetime.now().strftime("%Y-%m-%d")
+    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://newsSVOih.ru/</loc>
+    <lastmod>{now}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://newsSVOih.ru/news.html</loc>
+    <lastmod>{now}</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+</urlset>
+"""
+    with open("public/sitemap.xml", "w", encoding="utf-8") as f:
+        f.write(sitemap)
 
 def main():
     posts = fetch_latest_posts()
     os.makedirs("public", exist_ok=True)
+
+    generate_sitemap()
+
     with open("public/news.html", "w", encoding="utf-8") as f:
         if not posts:
             f.write(f"<p>Нет новых постов — {datetime.now()}</p>")
         else:
             for post in reversed(posts):
-    f.write(format_post(post))
+                f.write(format_post(post))
 
 if __name__ == "__main__":
     main()
+
 
 
 
