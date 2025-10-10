@@ -1,4 +1,5 @@
 import os
+import time
 import telebot
 from datetime import datetime
 
@@ -11,7 +12,8 @@ def clean_text(text):
     return text.replace("https://t.me/newsSVOih", "").strip()
 
 def fetch_latest_posts():
-    bot.remove_webhook()  # 🔧 Отключаем webhook перед polling
+    bot.remove_webhook()
+    time.sleep(1)  # 🔧 даём Telegram время отключить webhook
     updates = bot.get_updates()
     posts = [
         u.channel_post
@@ -47,6 +49,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
