@@ -84,7 +84,8 @@ def generate_sitemap():
 
 def git_push():
     subprocess.run(["git", "add", "public/news.html", "public/sitemap.xml"])
-    subprocess.run(["git", "commit", "-m", "Update news"])
+    subprocess.run(["git", "commit", "-m", "Update news.html and sitemap.xml with latest Telegram posts"])
+    subprocess.run(["git", "pull", "--rebase"])
     subprocess.run(["git", "push"])
 
 def main():
