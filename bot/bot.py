@@ -1,110 +1,72 @@
-import os
-import telebot
-import pytz
-from datetime import datetime
-from dotenv import load_dotenv
-import subprocess
 
-load_dotenv()
+        
+import os
+import time
+import telebot
+from datetime import datetime
+import pytz  # ⏰ добавляем поддержку часовых поясов
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-CHANNEL = os.getenv("TELEGRAM_CHANNEL")  # без @
+CHANNEL_ID = "@newsSVOih"
 
 bot = telebot.TeleBot(TOKEN)
 
+def clean_text(text):
+    return text.replace("https://t.me/newsSVOih", "").strip()
+
 def fetch_latest_posts():
+    bot.remove_webhook()
+    time.sleep(1)
     updates = bot.get_updates()
-    posts = []
-    for update in updates:
-        if update.message:
-            posts.append(update.message)
-    return posts[-10:]  # последние 10 постов
+    posts = [
+        u.channel_post
+        for u in updates
+        if u.channel_post and u.channel_post.chat.username == CHANNEL_ID[1:]
+    ]
+    return posts[-5:] if posts else []
 
-def format_post(post):
-    moscow = pytz.timezone("Europe/Moscow")
-    timestamp = datetime.fromtimestamp(post.date, tz=moscow).strftime("%d.%m.%Y %H:%M")
+def format_post(message):
+    html = "<article class='news-item'>\n"
 
-    text = post.text or ""
-    media = ""
+    if message.content_type == 'text':
+        html += f"<p>{clean_text(message.text)}</p>\n"
 
-    if post.photo:
-        file_id = post.photo[-1].file_id
-        file_info = bot.get_file(file_id)
+    elif message.content_type == 'photo':
+        file_info = bot.get_file(message.photo[-1].file_id)
         file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-        media = f'<img src="{file_url}" alt="Фото"><br>'
-    elif post.video:
-        file_id = post.video.file_id
-        file_info = bot.get_file(file_id)
+        caption = clean_text(message.caption or "")
+        html += f"<img src='{file_url}' alt='Фото' />\n"
+        html += f"<p>{caption}</p>\n"
+
+    elif message.content_type == 'video':
+        file_info = bot.get_file(message.video.file_id)
         file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-        media = f'<video controls src="{file_url}"></video><br>'
+        caption = clean_text(message.caption or "")
+        html += f"<video controls width='640'>\n"
+        html += f"  <source src='{file_url}' type='video/mp4'>\n"
+        html += f"  Ваш браузер не поддерживает видео.\n"
+        html += f"</video>\n"
+        html += f"<p>{caption}</p>\n"
 
-    return f"""
-    <div class="news-item">
-      {media}
-      <p>{text}</p>
-      <div class="timestamp">Опубликовано: {timestamp}</div>
-      <a href="https://t.me/{CHANNEL}/{post.message_id}">Открыть в Telegram</a>
-    </div>
-    """
+    # 🕒 Добавляем московское время
+    moscow_tz = pytz.timezone("Europe/Moscow")
+    timestamp = datetime.fromtimestamp(message.date, moscow_tz).strftime("%d.%m.%Y %H:%M")
+    html += f"<p class='timestamp'>🕒 {timestamp}</p>\n"
 
-def wrap_html(content):
-    return f"""<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <title>Новости</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>Последние новости</h1>
-  {content}
-</body>
-</html>"""
-
-def generate_sitemap():
-    now = datetime.now().strftime("%Y-%m-%d")
-    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://newsSVOih.ru/</loc>
-    <lastmod>{now}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://newsSVOih.ru/news.html</loc>
-    <lastmod>{now}</lastmod>
-    <changefreq>hourly</changefreq>
-    <priority>0.9</priority>
-  </url>
-</urlset>
-"""
-    with open("public/sitemap.xml", "w", encoding="utf-8") as f:
-        f.write(sitemap)
-
-def git_push():
-    subprocess.run(["git", "add", "public/news.html", "public/sitemap.xml"])
-    subprocess.run(["git", "commit", "-m", "Update news.html and sitemap.xml with latest Telegram posts"])
-    subprocess.run(["git", "pull", "--rebase"])
-    subprocess.run(["git", "push"])
+    html += f"<a href='https://t.me/newsSVOih/{message.message_id}' target='_blank'>Читать в Telegram</a>\n"
+    html += f"<p class='source'>Источник: {message.chat.title}</p>\n"
+    html += "</article>\n"
+    return html
 
 def main():
     posts = fetch_latest_posts()
     os.makedirs("public", exist_ok=True)
-
-    generate_sitemap()
-
-    html_content = ""
-    if not posts:
-        html_content = f"<p>Нет новых постов — {datetime.now()}</p>"
-    else:
-        for post in reversed(posts):
-            html_content += format_post(post)
-
     with open("public/news.html", "w", encoding="utf-8") as f:
-        f.write(wrap_html(html_content))
-
-    git_push()
+        if not posts:
+            f.write(f"<p>Нет новых постов — {datetime.now()}</p>")
+        else:
+            for post in posts:
+                f.write(format_post(post))
 
 if __name__ == "__main__":
     main()
