@@ -6,11 +6,7 @@
   <title>Новости для Своих — независимые новости России и мира</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-
-  <!-- Яндекс.Вебмастер -->
   <meta name="yandex-verification" content="3a33e674e5836564">
-
-  <!-- SEO -->
   <meta name="description" content="Актуальные новости России и мира без фейков и лишнего шума. Главные события, аналитика, обзоры и факты — коротко и по делу.">
   <meta name="keywords" content="новости, Telegram, SVOih, события, видео, фото, Россия">
   <meta name="author" content="SVOih News Team">
@@ -18,7 +14,7 @@
 <body>
   <header>
     <div class="header-content">
-      <img src="/rf-flag.svg" alt="Флаг России" class="flag-icon" />
+      <img src="https://flagcdn.com/w320/ru.png" alt="Флаг России" class="flag-icon" />
       <div class="text-block">
         <h1>Новости для Своих</h1>
         <h2>Честные новости России и мира</h2>
@@ -29,7 +25,6 @@
         </p>
       </div>
     </div>
-
     <div class="search-wrapper">
       <input type="search" id="search-box" placeholder="Поиск по новостям…" />
     </div>
@@ -67,7 +62,7 @@
           if (visibleCount >= items.length) {
             document.getElementById('load-more').style.display = 'none';
           }
-          enableCardEnlargement(); // 👈 обработка клика
+          enableCardEnlargement();
         }
 
         document.getElementById('load-more').addEventListener('click', () => {
@@ -82,7 +77,6 @@
         console.error('Ошибка загрузки news.html:', error);
       });
 
-    // 🔍 Поиск по сайту
     document.getElementById('search-box').addEventListener('input', function(e) {
       const query = e.target.value.toLowerCase();
       document.querySelectorAll('.news-item').forEach(item => {
@@ -90,7 +84,6 @@
       });
     });
 
-    // 🖱 Увеличение карточки при клике
     function enableCardEnlargement() {
       document.querySelectorAll('.news-item').forEach(item => {
         item.addEventListener('click', () => {
@@ -102,9 +95,15 @@
 
   <!-- Yandex.Metrika counter -->
   <script type="text/javascript">
-      (function(m,e,t,r,i,k,a){
-          m[i]=m[i]function(){(m[i].a=m[i].a[]).push(arguments)};
-          m[i].l=1*new Date();
-          for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-      })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=104600251', 'ym');
+    (function(m,e,t,r,i,k,a){
+      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();
+      for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=104600251', 'ym');
+
+    ym(104600251, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
+  </script>
+  <noscript><div><img src="https://mc.yandex.ru/watch/104600251" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+</body>
+</html>
