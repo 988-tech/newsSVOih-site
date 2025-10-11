@@ -50,14 +50,9 @@ def format_post(message):
         html += f"<p>{caption}</p>\n"
 
     elif message.content_type == 'video':
-        file_info = bot.get_file(message.video.file_id)
-        file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
         caption = clean_text(message.caption or "")
-        html += f"<video controls width='640'>\n"
-        html += f"  <source src='{file_url}' type='video/mp4'>\n"
-        html += f"  Ваш браузер не поддерживает видео.\n"
-        html += f"</video>\n"
         html += f"<p>{caption}</p>\n"
+        html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{message.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
 
     moscow_tz = pytz.timezone("Europe/Moscow")
     timestamp = datetime.fromtimestamp(message.date, moscow_tz).strftime("%d.%m.%Y %H:%M")
