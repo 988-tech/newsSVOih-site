@@ -100,6 +100,39 @@ def save_seen_ids(ids):
         for id in ids:
             f.write(f"{id}\n")
 
+def update_sitemap():
+    today = datetime.now().strftime("%Y-%m-%d")
+    archive_exists = os.path.exists("public/archive.html")
+
+    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://newsSVOih.ru/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://newsSVOih.ru/news.html</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>"""
+
+    if archive_exists:
+        sitemap += f"""
+  <url>
+    <loc>https://newsSVOih.ru/archive.html</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>"""
+
+    sitemap += "\n</urlset>"
+
+    with open("public/sitemap.xml", "w", encoding="utf-8") as f:
+        f.write(sitemap)
+
 def main():
     grouped_posts = fetch_latest_posts()
     seen_ids = load_seen_ids()
@@ -149,6 +182,7 @@ def main():
         f.write(new_archive + old_archive)
 
     save_seen_ids(new_ids)
+    update_sitemap()
 
 if __name__ == "__main__":
     main()
