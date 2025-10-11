@@ -1,4 +1,3 @@
-/* Общие стили */
 body {
   margin: 0;
   padding: 0;
@@ -10,7 +9,23 @@ body {
   flex-direction: column;
 }
 
-/* Шапка сайта — графитово-синий стиль */
+/* 🔍 Поиск */
+.search-wrapper {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+#search-box {
+  width: 90%;
+  max-width: 600px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* 🧾 Шапка */
 header {
   background: linear-gradient(135deg, #2C3E50, #1A1A1A);
   color: white;
@@ -33,7 +48,14 @@ h2 {
   color: #cfd8dc;
 }
 
-/* Основной блок */
+.tagline {
+  font-size: 1rem;
+  color: #ccc;
+  margin-top: 1rem;
+  line-height: 1.6;
+}
+
+/* 📦 Основной блок */
 main {
   max-width: 1200px;
   margin: 3rem auto;
@@ -46,13 +68,6 @@ main {
   animation: fadeIn 1s ease;
 }
 
-p {
-  line-height: 1.7;
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-}
-
-/* Кнопка перехода и "Показать ещё" */
 a.button,
 button.button {
   display: inline-block;
@@ -63,7 +78,7 @@ button.button {
   padding: 14px 28px;
   border-radius: 10px;
   transition: background 0.3s, transform 0.2s;
-  margin-top: 1rem;
+  margin: 1rem 0.5rem;
   font-size: 1.1rem;
   border: none;
   cursor: pointer;
@@ -75,23 +90,7 @@ button.button:hover {
   transform: scale(1.03);
 }
 
-/* Подвал */
-footer {
-  text-align: center;
-  font-size: 0.9rem;
-  color: #ddd;
-  padding: 2rem 0;
-  background: rgba(0,0,0,0.6);
-  margin-top: auto;
-}
-
-/* Анимация появления */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Сетка новостей */
+/* 🧱 Сетка новостей */
 .news-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -99,7 +98,7 @@ footer {
   margin-top: 2rem;
 }
 
-/* Карточка новости */
+/* 📰 Карточка новости */
 .news-item {
   background-color: #f9f9f9;
   padding: 1.5rem;
@@ -109,12 +108,6 @@ footer {
   animation: fadeIn 0.6s ease;
 }
 
-.news-item p {
-  margin-bottom: 0.8rem;
-  font-size: 1rem;
-}
-
-/* Фото и видео */
 .news-item img,
 .news-item video {
   max-width: 100%;
@@ -123,7 +116,11 @@ footer {
   margin-bottom: 1rem;
 }
 
-/* Время публикации */
+.news-item p {
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+}
+
 .timestamp {
   font-size: 0.9rem;
   color: #777;
@@ -131,7 +128,6 @@ footer {
   margin-top: 0.5rem;
 }
 
-/* Ссылка на Telegram */
 .news-item a {
   display: inline-block;
   margin-top: 0.5rem;
@@ -140,14 +136,13 @@ footer {
   text-decoration: underline;
 }
 
-/* Источник */
 .source {
   font-size: 0.85rem;
   color: #999;
   margin-top: 0.3rem;
 }
 
-/* Адаптив */
+/* 📱 Адаптив */
 @media (max-width: 768px) {
   h1 { font-size: 2rem; }
   h2 { font-size: 1rem; }
