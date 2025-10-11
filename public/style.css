@@ -9,7 +9,6 @@ body {
   flex-direction: column;
 }
 
-/* 🔍 Поиск */
 .search-wrapper {
   margin-bottom: 1rem;
   text-align: center;
@@ -25,13 +24,12 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-/* 🧾 Шапка */
 header {
-  background-color: #d0f5d0; /* светло-зелёный */
+  background-color: #8BC34A;
   color: #222;
   text-align: left;
   padding: 2rem 1rem;
-  border-bottom: 4px solid #a0dca0;
+  border-bottom: 4px solid #689F38;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
@@ -67,7 +65,6 @@ header {
   line-height: 1.6;
 }
 
-/* 📦 Основной блок */
 main {
   max-width: 1200px;
   margin: 3rem auto;
@@ -102,7 +99,6 @@ button.button:hover {
   transform: scale(1.03);
 }
 
-/* 🧱 Сетка новостей */
 .news-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -111,7 +107,6 @@ button.button:hover {
   grid-auto-flow: dense;
 }
 
-/* 📰 Карточка новости */
 .news-item {
   background-color: #f9f9f9;
   padding: 1.5rem;
@@ -119,60 +114,4 @@ button.button:hover {
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   text-align: left;
   animation: fadeIn 0.6s ease;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-}
-
-.news-item.enlarged {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  z-index: 5;
-}
-
-.news-item img,
-.news-item video {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-}
-
-.news-item p {
-  margin-bottom: 0.8rem;
-  font-size: 1rem;
-}
-
-.timestamp {
-  font-size: 0.9rem;
-  color: #777;
-  font-style: italic;
-  margin-top: 0.5rem;
-}
-
-.news-item a {
-  display: inline-block;
-  margin-top: 0.5rem;
-  font-size: 0.95rem;
-  color: #2C3E50;
-  text-decoration: underline;
-}
-
-.source {
-  font-size: 0.85rem;
-  color: #999;
-  margin-top: 0.3rem;
-}
-
-/* 📱 Адаптив */
-@media (max-width: 768px) {
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1rem; }
-  main { margin: 2rem 1rem; padding: 1.5rem; }
-  .news-item { padding: 1rem; }
-  .news-grid { grid-template-columns: 1fr; }
-
-  .news-item.enlarged {
-    transform: none;
-    box-shadow: none;
-  }
-}
+  transition: transform
