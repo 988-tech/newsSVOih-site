@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 
   <!-- Яндекс.Вебмастер -->
-  <meta name="yandex-verification" content="ТВОЙ_КОД_ЯНДЕКС">
+  <meta name="yandex-verification" content="3a33e674e5836564">
 
   <!-- Google Search Console -->
   <meta name="google-site-verification" content="ТВОЙ_КОД_ГУГЛ">
@@ -17,7 +17,7 @@
   <meta name="keywords" content="новости, Telegram, SVOih, события, видео, фото, Россия">
   <meta name="author" content="SVOih News Team">
 
-  <!-- Open Graph (для соцсетей) -->
+  <!-- Open Graph -->
   <meta property="og:title" content="Новости для Своих">
   <meta property="og:description" content="Фото, видео и события из Telegram-канала SVOih.">
   <meta property="og:type" content="website">
@@ -40,8 +40,8 @@
 
     <section id="news-feed">
       <h3>Последние новости</h3>
-      <!-- Вставляем содержимое news.html прямо сюда -->
-      <div id="news-container"></div>
+      <div id="news-container" class="news-grid"></div>
+      <button id="load-more" class="button">Показать ещё</button>
     </section>
   </main>
 
@@ -50,11 +50,30 @@
   </footer>
 
   <script>
-    // Загружаем содержимое news.html и вставляем внутрь #news-container
     fetch('/news.html')
       .then(response => response.text())
       .then(html => {
-        document.getElementById('news-container').innerHTML = html;
+        const container = document.getElementById('news-container');
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+
+        const items = Array.from(temp.querySelectorAll('.news-item'));
+        let visibleCount = 9;
+
+        function renderItems() {
+          container.innerHTML = '';
+          items.slice(0, visibleCount).forEach(item => container.appendChild(item));
+          if (visibleCount >= items.length) {
+            document.getElementById('load-more').style.display = 'none';
+          }
+        }
+
+        document.getElementById('load-more').addEventListener('click', () => {
+          visibleCount += 9;
+          renderItems();
+        });
+
+        renderItems();
       })
       .catch(error => {
         document.getElementById('news-container').innerHTML = '<p>Не удалось загрузить новости.</p>';
@@ -83,6 +102,5 @@
   <noscript>
     <div><img src="https://mc.yandex.ru/watch/104596413" style="position:absolute; left:-9999px;" alt="" /></div>
   </noscript>
-  <!-- /Yandex.Metrika counter -->
 </body>
 </html>
