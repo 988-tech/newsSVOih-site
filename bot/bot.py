@@ -3,6 +3,7 @@ import time
 import telebot
 from datetime import datetime
 import pytz
+from collections import defaultdict
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHANNEL_ID = "@newsSVOih"
@@ -34,31 +35,45 @@ def fetch_latest_posts():
         for u in updates
         if u.channel_post and u.channel_post.chat.username == CHANNEL_ID[1:]
     ]
-    return posts[-5:] if posts else []
 
-def format_post(message):
+    grouped = defaultdict(list)
+    for post in posts:
+        group_id = getattr(post, 'media_group_id', None)
+        key = group_id if group_id else f"single_{post.message_id}"
+        grouped[key].append(post)
+
+    return list(grouped.values())[-5:] if grouped else []
+
+def format_post(messages):
     html = "<article class='news-item'>\n"
+    caption = ""
 
-    if message.content_type == 'text':
-        html += f"<p>{clean_text(message.text)}</p>\n"
+    for msg in messages:
+        if msg.content_type == 'photo':
+            try:
+                file_info = bot.get_file(msg.photo[-1].file_id)
+                file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
+                html += f"<img src='{file_url}' alt='Фото' />\n"
+            except:
+                html += f"<p>📷 Фото недоступно</p>\n"
+            if msg.caption:
+                caption = clean_text(msg.caption)
 
-    elif message.content_type == 'photo':
-        file_info = bot.get_file(message.photo[-1].file_id)
-        file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-        caption = clean_text(message.caption or "")
-        html += f"<img src='{file_url}' alt='Фото' />\n"
+        elif msg.content_type == 'video':
+            if msg.caption:
+                caption = clean_text(msg.caption)
+            html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
+
+        elif msg.content_type == 'text':
+            caption = clean_text(msg.text)
+
+    if caption:
         html += f"<p>{caption}</p>\n"
 
-    elif message.content_type == 'video':
-        caption = clean_text(message.caption or "")
-        html += f"<p>{caption}</p>\n"
-        html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{message.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
-
-    moscow_tz = pytz.timezone("Europe/Moscow")
-    timestamp = datetime.fromtimestamp(message.date, moscow_tz).strftime("%d.%m.%Y %H:%M")
+    timestamp = datetime.fromtimestamp(messages[0].date, pytz.timezone("Europe/Moscow")).strftime("%d.%m.%Y %H:%M")
     html += f"<p class='timestamp'>🕒 {timestamp}</p>\n"
-    html += f"<a href='https://t.me/newsSVOih/{message.message_id}' target='_blank'>Читать в Telegram</a>\n"
-    html += f"<p class='source'>Источник: {message.chat.title}</p>\n"
+    html += f"<a href='https://t.me/{CHANNEL_ID[1:]}/{messages[0].message_id}' target='_blank'>Читать в Telegram</a>\n"
+    html += f"<p class='source'>Источник: {messages[0].chat.title}</p>\n"
     html += "</article>\n"
     return html
 
@@ -74,11 +89,19 @@ def save_seen_ids(ids):
             f.write(f"{id}\n")
 
 def main():
-    posts = fetch_latest_posts()
+    grouped_posts = fetch_latest_posts()
     seen_ids = load_seen_ids()
-    new_posts = [p for p in posts if str(p.message_id) not in seen_ids]
 
-    if not new_posts:
+    new_groups = []
+    new_ids = []
+
+    for group in grouped_posts:
+        group_ids = [str(msg.message_id) for msg in group]
+        if any(mid not in seen_ids for mid in group_ids):
+            new_groups.append(group)
+            new_ids.extend(group_ids)
+
+    if not new_groups:
         print("Нет новых постов.")
         return
 
@@ -90,10 +113,8 @@ def main():
             old_content = f.read()
 
     new_content = ""
-    new_ids = []
-    for post in reversed(new_posts):  # новые посты сверху
-        new_content += format_post(post)
-        new_ids.append(str(post.message_id))
+    for group in reversed(new_groups):  # новые посты сверху
+        new_content += format_post(group)
 
     full_content = new_content + old_content
 
