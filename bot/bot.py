@@ -7,7 +7,7 @@ from collections import defaultdict
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHANNEL_ID = "@newsSVOih"
-SEEN_GROUPS_FILE = "seen_groups.txt"
+SEEN_IDS_FILE = "seen_ids.txt"
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -15,7 +15,6 @@ def clean_text(text):
     if not text:
         return ""
     text = text.replace("https://t.me/newsSVOih", "").strip()
-
     unwanted_phrases = [
         "💪Подписаться на новости для своих🇷🇺",
         "Подписаться на новости для своих🇷🇷",
@@ -42,12 +41,12 @@ def fetch_latest_posts():
         key = group_id if group_id else f"single_{post.message_id}"
         grouped[key].append(post)
 
-    return list(grouped.items())[-5:] if grouped else []
+    return list(grouped.items())[-10:] if grouped else []
 
-def format_post(group_key, messages):
+def format_post(messages):
     html = "<article class='news-item'>\n"
     caption = ""
-    video_count = sum(1 for msg in messages if msg.content_type == 'video')
+    video_shown = False
 
     for msg in messages:
         if msg.content_type == 'photo':
@@ -63,7 +62,7 @@ def format_post(group_key, messages):
         elif msg.content_type == 'video':
             if msg.caption:
                 caption = clean_text(msg.caption)
-            if video_count == 1:
+            if not video_shown:
                 try:
                     file_info = bot.get_file(msg.video.file_id)
                     file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
@@ -71,6 +70,7 @@ def format_post(group_key, messages):
                     html += f"  <source src='{file_url}' type='video/mp4'>\n"
                     html += f"  Ваш браузер не поддерживает видео.\n"
                     html += f"</video>\n"
+                    video_shown = True
                 except:
                     html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
             else:
@@ -89,28 +89,30 @@ def format_post(group_key, messages):
     html += "</article>\n"
     return html
 
-def load_seen_groups():
-    if not os.path.exists(SEEN_GROUPS_FILE):
+def load_seen_ids():
+    if not os.path.exists(SEEN_IDS_FILE):
         return set()
-    with open(SEEN_GROUPS_FILE, "r") as f:
+    with open(SEEN_IDS_FILE, "r") as f:
         return set(line.strip() for line in f)
 
-def save_seen_groups(keys):
-    with open(SEEN_GROUPS_FILE, "a") as f:
-        for key in keys:
-            f.write(f"{key}\n")
+def save_seen_ids(ids):
+    with open(SEEN_IDS_FILE, "a") as f:
+        for id in ids:
+            f.write(f"{id}\n")
 
 def main():
     grouped_posts = fetch_latest_posts()
-    seen_groups = load_seen_groups()
+    seen_ids = load_seen_ids()
 
     new_groups = []
-    new_keys = []
+    new_ids = []
 
-    for key, group in grouped_posts:
-        if key not in seen_groups:
-            new_groups.append((key, group))
-            new_keys.append(key)
+    for _, group in grouped_posts:
+        group_ids = [str(msg.message_id) for msg in group]
+        if any(gid in seen_ids for gid in group_ids):
+            continue
+        new_groups.append(group)
+        new_ids.extend(group_ids)
 
     if not new_groups:
         print("Нет новых постов.")
@@ -124,15 +126,15 @@ def main():
             old_content = f.read()
 
     new_content = ""
-    for key, group in reversed(new_groups):  # новые посты сверху
-        new_content += format_post(key, group)
+    for group in reversed(new_groups):  # новые посты сверху
+        new_content += format_post(group)
 
     full_content = new_content + old_content
 
     with open("public/news.html", "w", encoding="utf-8") as f:
         f.write(full_content)
 
-    save_seen_groups(new_keys)
+    save_seen_ids(new_ids)
 
 if __name__ == "__main__":
     main()
