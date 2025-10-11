@@ -1,3 +1,4 @@
+/* Общие стили */
 body {
   margin: 0;
   padding: 0;
@@ -9,66 +10,34 @@ body {
   flex-direction: column;
 }
 
-.search-wrapper {
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-#search-box {
-  width: 90%;
-  max-width: 600px;
-  padding: 12px 16px;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
+/* Шапка сайта в милитари-стиле */
 header {
-  background-color: #8BC34A;
-  color: #222;
-  text-align: left;
-  padding: 2rem 1rem;
-  border-bottom: 4px solid #689F38;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #556B2F, #3C3B32);
+  color: white;
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  border-bottom: 4px solid #2F4F4F;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.flag-icon {
-  width: 48px;
-  height: auto;
-}
-
-.text-block h1 {
-  margin: 0;
+h1 {
   font-size: 2.4rem;
+  margin-bottom: 0.3rem;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-.text-block h2 {
-  margin: 5px 0;
+h2 {
   font-size: 1.2rem;
-  color: #444;
+  font-weight: normal;
+  color: #d8e0d8;
 }
 
-.tagline {
-  font-size: 1rem;
-  color: #555;
-  margin-top: 1rem;
-  line-height: 1.6;
-}
-
+/* Основной блок */
 main {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 3rem auto;
-  background: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,0.9);
   padding: 2rem;
   border-radius: 16px;
   text-align: center;
@@ -77,41 +46,100 @@ main {
   animation: fadeIn 1s ease;
 }
 
-a.button,
-button.button {
+p {
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+/* Кнопка перехода */
+a.button {
   display: inline-block;
-  background: #2C3E50;
+  background: #3C3B32;
   color: white;
   text-decoration: none;
   font-weight: bold;
   padding: 14px 28px;
   border-radius: 10px;
   transition: background 0.3s, transform 0.2s;
-  margin: 1rem 0.5rem;
+  margin-top: 1rem;
   font-size: 1.1rem;
-  border: none;
-  cursor: pointer;
 }
 
-a.button:hover,
-button.button:hover {
-  background: #34495E;
+a.button:hover {
+  background: #556B2F;
   transform: scale(1.03);
 }
 
-.news-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
-  margin-top: 2rem;
-  grid-auto-flow: dense;
+/* Подвал */
+footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #ddd;
+  padding: 2rem 0;
+  background: rgba(0,0,0,0.6);
+  margin-top: auto;
 }
 
+/* Анимация появления */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Новости */
 .news-item {
   background-color: #f9f9f9;
   padding: 1.5rem;
+  margin-bottom: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   text-align: left;
   animation: fadeIn 0.6s ease;
-  transition: transform
+}
+
+.news-item p {
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+}
+
+/* Фото и видео */
+.news-item img,
+.news-item video {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* Время публикации */
+.timestamp {
+  font-size: 0.9rem;
+  color: #777;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+/* Ссылка на Telegram */
+.news-item a {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #3C3B32;
+  text-decoration: underline;
+}
+
+/* Источник */
+.source {
+  font-size: 0.85rem;
+  color: #999;
+  margin-top: 0.3rem;
+}
+
+/* Адаптив */
+@media (max-width: 600px) {
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1rem; }
+  main { margin: 2rem 1rem; padding: 1.5rem; }
+  .news-item { padding: 1rem; }
+}
