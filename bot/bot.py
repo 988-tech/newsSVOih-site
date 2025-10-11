@@ -1,7 +1,7 @@
 import os
 import time
 import telebot
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from collections import defaultdict
 
@@ -41,7 +41,7 @@ def fetch_latest_posts():
         key = group_id if group_id else f"single_{post.message_id}"
         grouped[key].append(post)
 
-    return list(grouped.items())[-10:] if grouped else []
+    return list(grouped.items())[-30:] if grouped else []
 
 def format_post(messages):
     html = "<article class='news-item'>\n"
@@ -82,12 +82,12 @@ def format_post(messages):
     if caption:
         html += f"<p>{caption}</p>\n"
 
-    timestamp = datetime.fromtimestamp(messages[0].date, pytz.timezone("Europe/Moscow")).strftime("%d.%m.%Y %H:%M")
-    html += f"<p class='timestamp'>🕒 {timestamp}</p>\n"
+    timestamp = datetime.fromtimestamp(messages[0].date, pytz.timezone("Europe/Moscow"))
+    html += f"<p class='timestamp'>🕒 {timestamp.strftime('%d.%m.%Y %H:%M')}</p>\n"
     html += f"<a href='https://t.me/{CHANNEL_ID[1:]}/{messages[0].message_id}' target='_blank'>Читать в Telegram</a>\n"
     html += f"<p class='source'>Источник: {messages[0].chat.title}</p>\n"
     html += "</article>\n"
-    return html
+    return html, timestamp
 
 def load_seen_ids():
     if not os.path.exists(SEEN_IDS_FILE):
@@ -120,19 +120,33 @@ def main():
 
     os.makedirs("public", exist_ok=True)
 
-    old_content = ""
+    cutoff = datetime.now(pytz.timezone("Europe/Moscow")) - timedelta(days=5)
+
+    old_news = ""
     if os.path.exists("public/news.html"):
         with open("public/news.html", "r", encoding="utf-8") as f:
-            old_content = f.read()
+            old_news = f.read()
 
-    new_content = ""
-    for group in reversed(new_groups):  # новые посты сверху
-        new_content += format_post(group)
+    old_archive = ""
+    if os.path.exists("public/archive.html"):
+        with open("public/archive.html", "r", encoding="utf-8") as f:
+            old_archive = f.read()
 
-    full_content = new_content + old_content
+    new_news = ""
+    new_archive = ""
+
+    for group in reversed(new_groups):
+        html, ts = format_post(group)
+        if ts < cutoff:
+            new_archive += html
+        else:
+            new_news += html
 
     with open("public/news.html", "w", encoding="utf-8") as f:
-        f.write(full_content)
+        f.write(new_news + old_news)
+
+    with open("public/archive.html", "w", encoding="utf-8") as f:
+        f.write(new_archive + old_archive)
 
     save_seen_ids(new_ids)
 
