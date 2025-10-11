@@ -9,34 +9,30 @@
   <!-- Яндекс.Вебмастер -->
   <meta name="yandex-verification" content="3a33e674e5836564">
 
-  <!-- Google Search Console -->
-  <meta name="google-site-verification" content="ТВОЙ_КОД_ГУГЛ">
-
   <!-- SEO -->
-  <meta name="description" content="Свежие новости из Telegram-канала SVOih. Фото, видео, события.">
+  <meta name="description" content="Актуальные новости России и мира без фейков и лишнего шума. Главные события, аналитика, обзоры и факты — коротко и по делу.">
   <meta name="keywords" content="новости, Telegram, SVOih, события, видео, фото, Россия">
   <meta name="author" content="SVOih News Team">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Новости для Своих">
-  <meta property="og:description" content="Фото, видео и события из Telegram-канала SVOih.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://newsSVOih.ru/">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Новости для Своих">
-  <meta name="twitter:description" content="Фото, видео и события из Telegram-канала SVOih.">
 </head>
 <body>
   <header>
+    <!-- 🔍 Поиск -->
+    <div class="search-wrapper">
+      <input type="search" id="search-box" placeholder="Поиск по новостям…" />
+    </div>
+
     <h1>Новости для Своих</h1>
     <h2>Честные новости России и мира</h2>
+    <p class="tagline">
+      Актуальные новости России и мира без фейков и лишнего шума.<br>
+      Главные события, аналитика, обзоры и факты — коротко и по делу.<br>
+      Читайте свежие новости, политические и военные сводки, новости экономики, технологий и общества.
+    </p>
   </header>
 
   <main>
-    <p><strong>Новости для Своих</strong> — независимый Telegram-канал о событиях в России и мире.</p>
     <a href="https://t.me/newsSVOih" class="button" target="_blank">Перейти в Telegram-канал</a>
+    <a href="archive.html" class="button">Архив</a>
 
     <section id="news-feed">
       <h3>Последние новости</h3>
@@ -49,6 +45,7 @@
     © 2025 Новости для Своих
   </footer>
 
+  <!-- 🔘 Подгрузка новостей -->
   <script>
     fetch('/news.html')
       .then(response => response.text())
@@ -79,28 +76,14 @@
         document.getElementById('news-container').innerHTML = '<p>Не удалось загрузить новости.</p>';
         console.error('Ошибка загрузки news.html:', error);
       });
-  </script>
 
-  <!-- Yandex.Metrika counter -->
-  <script type="text/javascript">
-    (function(m,e,t,r,i,k,a){
-        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-        m[i].l=1*new Date();
-        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=104596413', 'ym');
-
-    ym(104596413, 'init', {
-      ssr:true,
-      webvisor:true,
-      clickmap:true,
-      ecommerce:"dataLayer",
-      accurateTrackBounce:true,
-      trackLinks:true
+    // 🔍 Поиск по сайту
+    document.getElementById('search-box').addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll('.news-item').forEach(item => {
+        item.style.display = item.textContent.toLowerCase().includes(query) ? '' : 'none';
+      });
     });
   </script>
-  <noscript>
-    <div><img src="https://mc.yandex.ru/watch/104596413" style="position:absolute; left:-9999px;" alt="" /></div>
-  </noscript>
 </body>
 </html>
