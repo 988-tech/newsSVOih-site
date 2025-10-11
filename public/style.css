@@ -10,13 +10,13 @@ body {
   flex-direction: column;
 }
 
-/* Шапка сайта в милитари-стиле */
+/* Шапка сайта — графитово-синий стиль */
 header {
-  background: linear-gradient(135deg, #556B2F, #3C3B32);
+  background: linear-gradient(135deg, #2C3E50, #1A1A1A);
   color: white;
   text-align: center;
   padding: 3rem 1rem 2rem;
-  border-bottom: 4px solid #2F4F4F;
+  border-bottom: 4px solid #0D0D0D;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
@@ -30,14 +30,14 @@ h1 {
 h2 {
   font-size: 1.2rem;
   font-weight: normal;
-  color: #d8e0d8;
+  color: #cfd8dc;
 }
 
 /* Основной блок */
 main {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 3rem auto;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.92);
   padding: 2rem;
   border-radius: 16px;
   text-align: center;
@@ -52,10 +52,11 @@ p {
   font-size: 1.1rem;
 }
 
-/* Кнопка перехода */
-a.button {
+/* Кнопка перехода и "Показать ещё" */
+a.button,
+button.button {
   display: inline-block;
-  background: #3C3B32;
+  background: #2C3E50;
   color: white;
   text-decoration: none;
   font-weight: bold;
@@ -64,10 +65,13 @@ a.button {
   transition: background 0.3s, transform 0.2s;
   margin-top: 1rem;
   font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
 }
 
-a.button:hover {
-  background: #556B2F;
+a.button:hover,
+button.button:hover {
+  background: #34495E;
   transform: scale(1.03);
 }
 
@@ -87,11 +91,18 @@ footer {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Новости */
+/* Сетка новостей */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 2rem;
+}
+
+/* Карточка новости */
 .news-item {
   background-color: #f9f9f9;
   padding: 1.5rem;
-  margin-bottom: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   text-align: left;
@@ -125,7 +136,7 @@ footer {
   display: inline-block;
   margin-top: 0.5rem;
   font-size: 0.95rem;
-  color: #3C3B32;
+  color: #2C3E50;
   text-decoration: underline;
 }
 
@@ -137,9 +148,10 @@ footer {
 }
 
 /* Адаптив */
-@media (max-width: 600px) {
-  h1 { font-size: 1.8rem; }
+@media (max-width: 768px) {
+  h1 { font-size: 2rem; }
   h2 { font-size: 1rem; }
   main { margin: 2rem 1rem; padding: 1.5rem; }
   .news-item { padding: 1rem; }
+  .news-grid { grid-template-columns: 1fr; }
 }
