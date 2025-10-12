@@ -1,82 +1,159 @@
 body {
-  margin: 0;
+  margin коммита:
+
+```bash: 0;
   padding: 0;
-  font-family: "Segoe UI", Roboto, sans-serif;
+  font-family
+git add public/index: "Segoe UI", Rob.html
+git commit -m "🛠 Модальноеoto, sans-serif;
   color: #222;
-  background: url("channel-banner.jpg") center center / cover no-repeat fixed;
-  min-height: 100vh;
+  окно работает только на десктопе, улучш background: urlена структура"
+``("channel-banner.jpg") center center`
+
+---
+
+### 📄 `style.css`
+
+```css / cover no-repeat fixed;
+  min-height
+body {
+  margin: 0;
+  padding: : 100vh;
+  display: flex;
+  flex-direction0;
+  font-family: "Segoe UI", Rob: column;
+}
+
+header {
+  background:oto, sans-serif;
+  color: #222;
+  linear-gradient(135deg, #556B2F background: url("channel-banner, #3C3B32);
+  color.jpg") center center: white;
+  text-align: center;
+  padding / cover no-repeat fixed;
+  min-height: 2rem 1rem 1rem;
+  border-bottom: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 header {
-  background: linear-gradient(135deg, #556B2F, #3C3B32);
+  background: linear-gradient(135deg, #556B2F: 4px solid #2F4F4F;
+  box-shadow, #3C3B32);
   color: white;
-  text-align: center;
-  padding: 2rem 1rem 1rem;
-  border-bottom: 4px solid #2F4F4F;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  text-align: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+: center;
+  padding: 2rem 1rem 1rem#search {
+  padding: 0.6rem 1rem;
+ ;
+  border-bottom: 4px solid #2F4 font-size: 1rem;
+  border-radiusF4F;
+  box-shadow: 0 4px 10px rgba: 8px;
+  border: none;
+  margin-bottom(0,0,0,0.3);
 }
 
 #search {
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-  margin-bottom: 1rem;
-  width: 80%;
+  padding: 1rem;
+  width:: 0.6rem 1rem;
+  80%;
   max-width: 400px;
 }
 
 h1 {
-  font-size: 2.4rem;
+ font-size: 1rem;
+  border-radius  font-size: 2.4: 8px;
+  border:rem;
   margin-bottom: 0.3rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  text none;
+  margin-bottom: 1rem;
+  width:-transform: uppercase;
+  letter-spacing 80%;
+  max-width: 400px;
+}
+
+h1 {
+: 1px;
 }
 
 h2 {
-  font-size: 1.2rem;
+  font-size: 1.2rem  font-size: 2.4rem;
+  margin-bottom;
   font-weight: normal;
   color: #d8e0d8;
 }
 
-.intro {
+.int: 0.3rem;
+  text-transform: uppercasero {
   font-size: 1rem;
-  color: #eee;
-  margin-top: 1rem;
-  line-height: 1.6;
+  color:;
+  letter-spacing #eee;
+  margin-top: 1px;
+}
+
+h2 {
+  font-size: 1.2rem: 1rem;
+  line-height;
+  font-weight:: 1.6;
 }
 
 main {
-  max-width: 1000px;
+  max-width: 100 normal;
+  color: #d8e0d8;
+}
+
+.int0px;
   margin: 3rem auto;
-  background: rgba(255,255,255,0.9);
-  padding: 2rem;
+  backgroundro {
+  font-size: 1rem;
+  color:: rgba(255,255,255,0.9);
+  padding #eee;
+  margin-top: 1rem;
+  line-height: 2rem;
   border-radius: 16px;
-  text-align: center;
+ : 1.6;
+}
+
+main {
+  max-width: 100 text-align: center;
   flex: 1;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  animation: fadeIn 1s ease;
+  box0px;
+  margin: 3rem auto;
+  background-shadow: 0 4px 12: rgba(255,255,255px rgba(0,0,0,0.1);
+  animation:,0.9);
+  padding: 2rem;
+  border fadeIn 1s ease;
 }
 
 .news-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+-radius: 16px;
+  text-align: center;
+  flex: 1;
+  box-shadow: 0 4px 12  display: grid;
+px rgba(0,0,0,0.  grid-template-columns: repeat(auto-fill1);
+  animation: fadeIn 1s ease;
+, minmax(300px, 1fr));
+  gap: 2rem}
+
+.news-grid {
+;
+  margin-top:   display: grid;
+  grid-template-columns2rem;
 }
 
-.news-item {
+.news-item: repeat(auto-fill {
+  background-color, minmax(300px, : #f9f9f9;
+  padding: 1.5rem;
+  border1fr));
+  gap: 2rem;
+  margin-top: -radius: 12px;
+ 2rem;
+}
+
+.news-item box-shadow: 0 2 {
   background-color: #f9f9f9;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  text-align: left;
-  animation: fadeIn 0.6s ease;
-  break-inside: avoid;
-  cursor: pointer;
-}
-
-.news-item p {
-  margin-bottom: 0.
+  box-shadow: 0 2px 8px rgba(0,[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/wolf-front/lifefinance24/tree/3fd914c9203b1ab9c15d17d4b31a0eeae453e8c4/resources%2Fviews%2Flayouts%2Fparts%2Fhead.blade.php?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054&citationId=1&citationId=2&citationId=3&citationId=4 "github.com")
