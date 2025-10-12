@@ -55,6 +55,7 @@ def fetch_latest_posts():
             grouped[key].append(post)
 
         return list(grouped.items())[-30:] if grouped else []
+
 def format_post(messages):
     timestamp = datetime.fromtimestamp(messages[0].date.timestamp(), pytz.timezone("Europe/Moscow"))
     date_str = timestamp.strftime('%Y-%m-%d')
