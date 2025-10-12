@@ -2,3 +2,7 @@ User-agent: *
 Allow: /
 
 Sitemap: https://newsSVOih.ru/sitemap.xml
+
+# Для Яндекса
+Host: https://newsSVOih.ru
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term /index.html
