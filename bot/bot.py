@@ -31,7 +31,8 @@ def fetch_latest_posts():
     if BOT_MODE == "generate":
         api_id = int(os.getenv("TG_API_ID"))
         api_hash = os.getenv("TG_API_HASH")
-        with TelegramClient('bot/session', api_id, api_hash) as client:
+        bot_token = os.getenv("TELEGRAM_TOKEN")
+        with TelegramClient('bot/session', api_id, api_hash).start(bot_token=bot_token) as client:
             messages = client.get_messages(CHANNEL_ID, limit=30)
             grouped = defaultdict(list)
             for msg in messages:
@@ -39,8 +40,7 @@ def fetch_latest_posts():
                 grouped[group_id].append(msg)
             return list(grouped.items())
     else:
-        # polling-режим: используем telebot
-        return []  # В режиме polling fetch_latest_posts не нужен
+        return []
 
 def format_post(messages):
     timestamp = datetime.fromtimestamp(messages[0].date.timestamp(), pytz.timezone("Europe/Moscow"))
