@@ -63,7 +63,7 @@
     document.addEventListener('click', function(e) {
       const modal = document.getElementById('modal');
       const modalContent = document.getElementById('modal-content');
-      if (e.target.closest('.news-item')) {
+      if (window.innerWidth > 768 && e.target.closest('.news-item')) {
         const clone = e.target.closest('.news-item').cloneNode(true);
         modalContent.innerHTML = '';
         modalContent.appendChild(clone);
@@ -78,7 +78,7 @@
   <!-- Yandex.Metrika counter -->
   <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
-        m[i]=m[i]function(){(m[i].a=m[i].a[]).push(arguments)};
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
         m[i].l=1*new Date();
         k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
     })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
