@@ -1,7 +1,7 @@
 import os
 import time
 import telebot
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
 from collections import defaultdict
 from telethon.sync import TelegramClient
@@ -28,16 +28,33 @@ def clean_text(text):
     return text.strip()
 
 def fetch_latest_posts():
-    api_id = int(os.getenv("TG_API_ID"))
-    api_hash = os.getenv("TG_API_HASH")
-    with TelegramClient('bot/session', api_id, api_hash) as client:
-        messages = client.get_messages(CHANNEL_ID, limit=30)
-        grouped = defaultdict(list)
-        for msg in messages:
-            group_id = msg.grouped_id or f"single_{msg.id}"
-            grouped[group_id].append(msg)
-        return list(grouped.items())
+    if BOT_MODE == "generate":
+        api_id = int(os.getenv("TG_API_ID"))
+        api_hash = os.getenv("TG_API_HASH")
+        with TelegramClient('bot/session', api_id, api_hash) as client:
+            messages = client.get_messages(CHANNEL_ID, limit=30)
+            grouped = defaultdict(list)
+            for msg in messages:
+                group_id = msg.grouped_id or f"single_{msg.id}"
+                grouped[group_id].append(msg)
+            return list(grouped.items())
+    else:
+        bot.remove_webhook()
+        time.sleep(1)
+        updates = bot.get_updates()
+        posts = [
+            u.channel_post
+            for u in updates
+            if u.channel_post and u.channel_post.chat.username == CHANNEL_ID[1:]
+        ]
 
+        grouped = defaultdict(list)
+        for post in posts:
+            group_id = getattr(post, 'media_group_id', None)
+            key = group_id if group_id else f"single_{post.message_id}"
+            grouped[key].append(post)
+
+        return list(grouped.items())[-30:] if grouped else []
 def format_post(messages):
     timestamp = datetime.fromtimestamp(messages[0].date.timestamp(), pytz.timezone("Europe/Moscow"))
     date_str = timestamp.strftime('%Y-%m-%d')
@@ -47,12 +64,8 @@ def format_post(messages):
 
     for msg in messages:
         if hasattr(msg, 'photo') and msg.photo:
-            try:
-                file = msg.photo
-                file_url = f"https://t.me/{CHANNEL_ID[1:]}/{msg.id}"
-                html += f"<img src='{file_url}' alt='Фото' />\n"
-            except:
-                html += f"<p>📷 Фото недоступно</p>\n"
+            file_url = f"https://t.me/{CHANNEL_ID[1:]}/{msg.id}"
+            html += f"<img src='{file_url}' alt='Фото' />\n"
             if msg.text:
                 caption = clean_text(msg.text)
 
@@ -67,7 +80,7 @@ def format_post(messages):
                 html += f"</video>\n"
                 video_shown = True
             else:
-                html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
+                html += f"<p><a href='{file_url}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
 
         elif msg.text:
             caption = clean_text(msg.text)
@@ -92,11 +105,6 @@ def save_seen_ids(ids):
         for id in ids:
             f.write(f"{id}\n")
 
-def update_sitemap():
-    today = datetime.now().strftime("%Y-%m-%d")
-    archive_exists = os.path.exists("public/archive.html")
-
-    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>"""
 def update_sitemap():
     today = datetime.now().strftime("%Y-%m-%d")
     archive_exists = os.path.exists("public/archive.html")
