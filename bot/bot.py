@@ -4,7 +4,6 @@ import telebot
 from datetime import datetime, timedelta
 import pytz
 from collections import defaultdict
-
 from telebot import types
 from telebot.handler_backends import State, StatesGroup
 from telebot.storage import StateMemoryStorage
@@ -122,13 +121,11 @@ def fetch_latest_posts():
         for u in updates
         if u.channel_post and u.channel_post.chat.username == CHANNEL_ID[1:]
     ]
-
     grouped = defaultdict(list)
     for post in posts:
         group_id = getattr(post, 'media_group_id', None)
         key = group_id if group_id else f"single_{post.message_id}"
         grouped[key].append(post)
-
     return list(grouped.items())[-30:] if grouped else []
 
 def format_post(messages):
@@ -137,7 +134,6 @@ def format_post(messages):
     html = f"<article class='news-item' data-date='{date_str}'>\n"
     caption = ""
     video_shown = False
-
     for msg in messages:
         if msg.content_type == 'photo':
             try:
@@ -148,7 +144,6 @@ def format_post(messages):
                 html += f"<p>📷 Фото недоступно</p>\n"
             if msg.caption:
                 caption = clean_text(msg.caption)
-
         elif msg.content_type == 'video':
             if msg.caption:
                 caption = clean_text(msg.caption)
@@ -158,24 +153,19 @@ def format_post(messages):
                     file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
                     html += f"<video controls width='640'>\n"
                     html += f"  <source src='{file_url}' type='video/mp4'>\n"
-                    html += f"  Ваш браузер не поддерживает видео.\n"
-                    html += f"</video>\n"
+                    html += f"  Ваш браузер не поддерживает видео.\n</video>\n"
                     video_shown = True
                 except:
                     html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
             else:
                 html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
-
         elif msg.content_type == 'text':
             caption = clean_text(msg.text)
-
     if caption:
         html += f"<p>{caption}</p>\n"
-
     html += f"<p class='timestamp'>🕒 {timestamp.strftime('%d.%m.%Y %H:%M')}</p>\n"
     html += f"<a href='https://t.me/{CHANNEL_ID[1:]}/{messages[0].message_id}' target='_blank'>Читать в Telegram</a>\n"
-    html += f"<p class='source'>Источник: {messages[0].chat.title}</p>\n"
-    html += "</article>\n"
+    html += f"<p class='source'>Источник: {messages[0].chat.title}</p>\n</article>\n"
     return html, timestamp
 
 def load_seen_ids():
@@ -279,10 +269,8 @@ def main():
     update_sitemap()
 
 if __name__ == "__main__":
-    from threading import Thread
-
-    # Запускаем Telegram-бота в отдельном потоке
-    Thread(target=lambda: bot.polling(none_stop=True)).start()
-
-    # Параллельно запускаем генерацию сайта
-    main()
+    mode = os.getenv("BOT_MODE", "polling")
+    if mode == "polling":
+        bot.polling(none_stop=True)
+    elif mode == "generate":
+        main()
