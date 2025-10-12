@@ -1,32 +1,16 @@
 import os
 import time
 import telebot
+from telebot import types
 from datetime import datetime, timedelta
 import pytz
 from collections import defaultdict
-from telebot import types
-from telebot.handler_backends import State, StatesGroup
-from telebot.storage import StateMemoryStorage
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHANNEL_ID = "@newsSVOih"
 SEEN_IDS_FILE = "seen_ids.txt"
-MANUAL_FILE = "public/manual_news.html"
 
-bot = telebot.TeleBot(TOKEN, state_storage=StateMemoryStorage())
-
-bot.set_my_commands([
-    types.BotCommand("start", "Запустить бота"),
-    types.BotCommand("addnews", "Добавить новость вручную"),
-    types.BotCommand("help", "Помощь и инструкция"),
-])
-
-class AddNewsStates(StatesGroup):
-    waiting_text = State()
-    waiting_photo = State()
-    waiting_video = State()
-    confirm = State()
-
+bot = telebot.TeleBot(TOKEN)
 user_data = {}
 
 def clean_text(text):
@@ -47,85 +31,85 @@ def clean_text(text):
 def start(message):
     bot.send_message(message.chat.id, "Привет! Я бот для новостей. Используй /addnews чтобы добавить новость.")
 
-@bot.message_handler(commands=['help'])
-def help(message):
-    bot.send_message(message.chat.id, "Команды:\n/addnews — добавить новость вручную\n/start — приветствие\n/help — помощь")
-
 @bot.message_handler(commands=['addnews'])
-def start_add_news(message):
+def add_news(message):
     user_data[message.chat.id] = {"text": "", "photo": "", "video": ""}
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add("📝 Текст", "📎 Фото", "🎥 Видео")
     markup.add("✅ Сохранить", "❌ Отмена")
     bot.send_message(message.chat.id, "Что хочешь добавить?", reply_markup=markup)
-    bot.set_state(message.from_user.id, AddNewsStates.confirm)
 
-@bot.message_handler(func=lambda m: m.text == "📝 Текст", state=AddNewsStates.confirm)
+@bot.message_handler(func=lambda m: m.text == "📝 Текст")
 def ask_text(message):
-    bot.send_message(message.chat.id, "Введи текст новости:")
-    bot.set_state(message.from_user.id, AddNewsStates.waiting_text)
+    bot.send_message(message.chat.id, "Отправь текст новости.")
+    bot.register_next_step_handler(message, save_text)
 
-@bot.message_handler(state=AddNewsStates.waiting_text)
-def receive_text(message):
+def save_text(message):
     user_data[message.chat.id]["text"] = message.text
     bot.send_message(message.chat.id, "Текст сохранён.")
-    bot.set_state(message.from_user.id, AddNewsStates.confirm)
 
-@bot.message_handler(func=lambda m: m.text == "📎 Фото", state=AddNewsStates.confirm)
+@bot.message_handler(func=lambda m: m.text == "📎 Фото")
 def ask_photo(message):
-    bot.send_message(message.chat.id, "Пришли фото.")
-    bot.set_state(message.from_user.id, AddNewsStates.waiting_photo)
+    bot.send_message(message.chat.id, "Отправь фото.")
+    bot.register_next_step_handler(message, save_photo)
 
-@bot.message_handler(content_types=['photo'], state=AddNewsStates.waiting_photo)
-def receive_photo(message):
-    file_info = bot.get_file(message.photo[-1].file_id)
-    file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-    user_data[message.chat.id]["photo"] = file_url
-    bot.send_message(message.chat.id, "Фото сохранено.")
-    bot.set_state(message.from_user.id, AddNewsStates.confirm)
+def save_photo(message):
+    if message.photo:
+        file_info = bot.get_file(message.photo[-1].file_id)
+        file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
+        user_data[message.chat.id]["photo"] = file_url
+        bot.send_message(message.chat.id, "Фото сохранено.")
+    else:
+        bot.send_message(message.chat.id, "Это не фото.")
 
-@bot.message_handler(func=lambda m: m.text == "🎥 Видео", state=AddNewsStates.confirm)
+@bot.message_handler(func=lambda m: m.text == "🎥 Видео")
 def ask_video(message):
-    bot.send_message(message.chat.id, "Пришли видео.")
-    bot.set_state(message.from_user.id, AddNewsStates.waiting_video)
+    bot.send_message(message.chat.id, "Отправь видео.")
+    bot.register_next_step_handler(message, save_video)
 
-@bot.message_handler(content_types=['video'], state=AddNewsStates.waiting_video)
-def receive_video(message):
-    file_info = bot.get_file(message.video.file_id)
-    file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-    user_data[message.chat.id]["video"] = file_url
-    bot.send_message(message.chat.id, "Видео сохранено.")
-    bot.set_state(message.from_user.id, AddNewsStates.confirm)
-
-@bot.message_handler(func=lambda m: m.text == "✅ Сохранить", state=AddNewsStates.confirm)
+def save_video(message):
+    if message.video:
+        file_info = bot.get_file(message.video.file_id)
+        file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
+        user_data[message.chat.id]["video"] = file_url
+        bot.send_message(message.chat.id, "Видео сохранено.")
+    else:
+        bot.send_message(message.chat.id, "Это не видео.")
+@bot.message_handler(func=lambda m: m.text == "✅ Сохранить")
 def save_news(message):
-    data = user_data.get(message.chat.id, {})
-    now = datetime.now(pytz.timezone("Europe/Moscow"))
-    date_str = now.strftime('%Y-%m-%d')
+    data = user_data.get(message.chat.id)
+    if not data:
+        bot.send_message(message.chat.id, "Нет данных для сохранения.")
+        return
+
+    timestamp = datetime.now(pytz.timezone("Europe/Moscow"))
+    date_str = timestamp.strftime('%Y-%m-%d')
     html = f"<article class='news-item' data-date='{date_str}'>\n"
-    if data.get("photo"):
+
+    if data["photo"]:
         html += f"<img src='{data['photo']}' alt='Фото' />\n"
-    if data.get("video"):
+    if data["video"]:
         html += f"<video controls width='640'>\n"
         html += f"  <source src='{data['video']}' type='video/mp4'>\n"
         html += f"  Ваш браузер не поддерживает видео.\n</video>\n"
-    if data.get("text"):
-        html += f"<p>{data['text']}</p>\n"
-    html += f"<p class='timestamp'>🕒 {now.strftime('%d.%m.%Y %H:%M')}</p>\n"
+    if data["text"]:
+        html += f"<p>{clean_text(data['text'])}</p>\n"
+
+    html += f"<p class='timestamp'>🕒 {timestamp.strftime('%d.%m.%Y %H:%M')}</p>\n"
     html += f"<p class='source'>Источник: добавлено вручную</p>\n</article>\n"
 
     os.makedirs("public", exist_ok=True)
-    with open(MANUAL_FILE, "a", encoding="utf-8") as f:
+    with open("public/manual_news.html", "a", encoding="utf-8") as f:
         f.write(html)
 
-    bot.send_message(message.chat.id, "✅ Новость добавлена!", reply_markup=types.ReplyKeyboardRemove())
-    bot.delete_state(message.from_user.id)
+    bot.send_message(message.chat.id, "✅ Новость сохранена!", reply_markup=types.ReplyKeyboardRemove())
+    user_data.pop(message.chat.id, None)
 
-@bot.message_handler(func=lambda m: m.text == "❌ Отмена", state=AddNewsStates.confirm)
+@bot.message_handler(func=lambda m: m.text == "❌ Отмена")
 def cancel_news(message):
     user_data.pop(message.chat.id, None)
     bot.send_message(message.chat.id, "❌ Добавление отменено.", reply_markup=types.ReplyKeyboardRemove())
-    bot.delete_state(message.from_user.id)
+
 def fetch_latest_posts():
     bot.remove_webhook()
     time.sleep(1)
@@ -141,46 +125,6 @@ def fetch_latest_posts():
         key = group_id if group_id else f"single_{post.message_id}"
         grouped[key].append(post)
     return list(grouped.items())
-
-def format_post(messages):
-    timestamp = datetime.fromtimestamp(messages[0].date, pytz.timezone("Europe/Moscow"))
-    date_str = timestamp.strftime('%Y-%m-%d')
-    html = f"<article class='news-item' data-date='{date_str}'>\n"
-    caption = ""
-    video_shown = False
-    for msg in messages:
-        if msg.content_type == 'photo':
-            try:
-                file_info = bot.get_file(msg.photo[-1].file_id)
-                file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-                html += f"<img src='{file_url}' alt='Фото' />\n"
-            except:
-                html += f"<p>📷 Фото недоступно</p>\n"
-            if msg.caption:
-                caption = clean_text(msg.caption)
-        elif msg.content_type == 'video':
-            if msg.caption:
-                caption = clean_text(msg.caption)
-            if not video_shown:
-                try:
-                    file_info = bot.get_file(msg.video.file_id)
-                    file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-                    html += f"<video controls width='640'>\n"
-                    html += f"  <source src='{file_url}' type='video/mp4'>\n"
-                    html += f"  Ваш браузер не поддерживает видео.\n</video>\n"
-                    video_shown = True
-                except:
-                    html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
-            else:
-                html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
-        elif msg.content_type == 'text':
-            caption = clean_text(msg.text)
-    if caption:
-        html += f"<p>{caption}</p>\n"
-    html += f"<p class='timestamp'>🕒 {timestamp.strftime('%d.%m.%Y %H:%M')}</p>\n"
-    html += f"<a href='https://t.me/{CHANNEL_ID[1:]}/{messages[0].message_id}' target='_blank'>Читать в Telegram</a>\n"
-    html += f"<p class='source'>Источник: {messages[0].chat.title}</p>\n</article>\n"
-    return html, timestamp
 
 def load_seen_ids():
     if not os.path.exists(SEEN_IDS_FILE):
@@ -225,6 +169,46 @@ def update_sitemap():
 
     with open("public/sitemap.xml", "w", encoding="utf-8") as f:
         f.write(sitemap)
+
+def format_post(messages):
+    timestamp = datetime.fromtimestamp(messages[0].date, pytz.timezone("Europe/Moscow"))
+    date_str = timestamp.strftime('%Y-%m-%d')
+    html = f"<article class='news-item' data-date='{date_str}'>\n"
+    caption = ""
+    video_shown = False
+    for msg in messages:
+        if msg.content_type == 'photo':
+            try:
+                file_info = bot.get_file(msg.photo[-1].file_id)
+                file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
+                html += f"<img src='{file_url}' alt='Фото' />\n"
+            except:
+                html += f"<p>📷 Фото недоступно</p>\n"
+            if msg.caption:
+                caption = clean_text(msg.caption)
+        elif msg.content_type == 'video':
+            if msg.caption:
+                caption = clean_text(msg.caption)
+            if not video_shown:
+                try:
+                    file_info = bot.get_file(msg.video.file_id)
+                    file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
+                    html += f"<video controls width='640'>\n"
+                    html += f"  <source src='{file_url}' type='video/mp4'>\n"
+                    html += f"  Ваш браузер не поддерживает видео.\n</video>\n"
+                    video_shown = True
+                except:
+                    html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
+            else:
+                html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
+        elif msg.content_type == 'text':
+            caption = clean_text(msg.text)
+    if caption:
+        html += f"<p>{caption}</p>\n"
+    html += f"<p class='timestamp'>🕒 {timestamp.strftime('%d.%m.%Y %H:%M')}</p>\n"
+    html += f"<a href='https://t.me/{CHANNEL_ID[1:]}/{messages[0].message_id}' target='_blank'>Читать в Telegram</a>\n"
+    html += f"<p class='source'>Источник: {messages[0].chat.title}</p>\n</article>\n"
+    return html, timestamp
 
 def main():
     print("⚙️ Запуск main()")
