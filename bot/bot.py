@@ -15,6 +15,12 @@ MANUAL_FILE = "public/manual_news.html"
 
 bot = telebot.TeleBot(TOKEN, state_storage=StateMemoryStorage())
 
+bot.set_my_commands([
+    types.BotCommand("start", "Запустить бота"),
+    types.BotCommand("addnews", "Добавить новость вручную"),
+    types.BotCommand("help", "Помощь и инструкция"),
+])
+
 class AddNewsStates(StatesGroup):
     waiting_text = State()
     waiting_photo = State()
@@ -36,6 +42,14 @@ def clean_text(text):
     for phrase in unwanted_phrases:
         text = text.replace(phrase, "")
     return text.strip()
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.send_message(message.chat.id, "Привет! Я бот для новостей. Используй /addnews чтобы добавить новость.")
+
+@bot.message_handler(commands=['help'])
+def help(message):
+    bot.send_message(message.chat.id, "Команды:\n/addnews — добавить новость вручную\n/start — приветствие\n/help — помощь")
 
 @bot.message_handler(commands=['addnews'])
 def start_add_news(message):
@@ -115,7 +129,7 @@ def cancel_news(message):
 def fetch_latest_posts():
     bot.remove_webhook()
     time.sleep(1)
-    updates = bot.get_updates()
+    updates = bot.get_updates(limit=30, timeout=5)
     posts = [
         u.channel_post
         for u in updates
@@ -126,7 +140,7 @@ def fetch_latest_posts():
         group_id = getattr(post, 'media_group_id', None)
         key = group_id if group_id else f"single_{post.message_id}"
         grouped[key].append(post)
-    return list(grouped.items())[-30:] if grouped else []
+    return list(grouped.items())
 
 def format_post(messages):
     timestamp = datetime.fromtimestamp(messages[0].date, pytz.timezone("Europe/Moscow"))
@@ -213,6 +227,7 @@ def update_sitemap():
         f.write(sitemap)
 
 def main():
+    print("⚙️ Запуск main()")
     grouped_posts = fetch_latest_posts()
     seen_ids = load_seen_ids()
 
@@ -227,7 +242,7 @@ def main():
         new_ids.extend(group_ids)
 
     if not new_groups:
-        print("Нет новых постов.")
+        print("ℹ️ Нет новых постов.")
         return
 
     os.makedirs("public", exist_ok=True)
@@ -267,19 +282,13 @@ def main():
 
     save_seen_ids(new_ids)
     update_sitemap()
+    print("✅ main() завершён")
 
 if __name__ == "__main__":
     mode = os.getenv("BOT_MODE", "polling")
     print("🟡 Запуск bot.py — режим:", mode)
-
     if mode == "polling":
-        print("📲 Запускаем Telegram-бот (polling)")
+        print("📲 Запускаем Telegram-бот")
         bot.polling(none_stop=True)
-
     elif mode == "generate":
-        print("⚙️ Запускаем main() — генерация сайта")
-        try:
-            main()
-            print("✅ main() завершён успешно")
-        except Exception as e:
-            print("❌ Ошибка в main():", e)
+        main()
