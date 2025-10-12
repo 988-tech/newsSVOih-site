@@ -5,131 +5,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Новости для Своих — независимые новости России и мира</title>
   <link rel="stylesheet" href="style.css" />
-  <meta name="yandex-verification" content="104596413">
-  <meta name="google-site-verification" content="ТВОЙ_КОД_ГУГЛ">
-  <meta name="description" content="Актуальные новости России и мира без фейков и лишнего шума. Главные события, аналитика, обзоры и факты — коротко и по делу. Читайте свежие новости, политические и военные сводки, новости экономики, технологий и общества.">
-  <meta name="keywords" content="новости, Telegram, SVOih, события, видео, фото, Россия, политика, экономика, технологии, общество">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+  <!-- Яндекс.Вебмастер -->
+  <meta name="yandex-verification" content="3a33e674e5836564">
+
+  <!-- SEO -->
+  <meta name="description" content="Актуальные новости России и мира без фейков и лишнего шума. Главные события, аналитика, обзоры и факты — коротко и по делу.">
+  <meta name="keywords" content="новости, Telegram, SVOih, события, видео, фото, Россия">
   <meta name="author" content="SVOih News Team">
-  <meta property="og:title" content="Новости для Своих — Telegram-канал" />
-  <meta property="og:description" content="Актуальные новости России и мира без фейков и лишнего шума. Главные события, аналитика, обзоры и факты — коротко и по делу." />
-  <meta property="og:image" content="https://newsSVOih.site/channel-banner.jpg" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Новости для Своих — Telegram-канал" />
-  <meta name="twitter:description" content="Читайте свежие новости, политические и военные сводки, новости экономики, технологий и общества." />
 </head>
 <body>
   <header>
-    <input type="search" id="search" placeholder="Поиск по новостям..." />
-    <h1>Новости для Своих</h1>
-    <h2>Честные новости России и мира</h2>
-    <p class="intro">
-      Актуальные новости России и мира без фейков и лишнего шума. Главные события, аналитика, обзоры и факты — коротко и по делу.<br>
-      Читайте свежие новости, политические и военные сводки, новости экономики, технологий и общества.
-    </p>
+    <div class="header-content">
+      <img src="/rf-flag.svg" alt="Флаг России" class="flag-icon" />
+      <div class="text-block">
+        <h1>Новости для Своих</h1>
+        <h2>Честные новости России и мира</h2>
+        <p class="tagline">
+          Актуальные новости России и мира без фейков и лишнего шума.<br>
+          Главные события, аналитика, обзоры и факты — коротко и по делу.<br>
+          Читайте свежие новости, политические и военные сводки, новости экономики, технологий и общества.
+        </p>
+      </div>
+    </div>
+
+    <div class="search-wrapper">
+      <input type="search" id="search-box" placeholder="Поиск по новостям…" />
+    </div>
   </header>
 
   <main>
-    <p><strong>Новости для Своих</strong> — независимый Telegram-канал о событиях в России и мире.</p>
     <a href="https://t.me/newsSVOih" class="button" target="_blank">Перейти в Telegram-канал</a>
-    <a href="archive.html" class="button">Архив новостей</a>
+    <a href="archive.html" class="button">Архив</a>
 
     <section id="news-feed">
       <h3>Последние новости</h3>
       <div id="news-container" class="news-grid"></div>
-      <button id="load-more">Показать ещё</button>
+      <button id="load-more" class="button">Показать ещё</button>
     </section>
   </main>
 
-  <footer>© 2025 Новости для Своих</footer>
-
-  <div id="modal" class="modal">
-    <div class="modal-content" id="modal-content"></div>
-  </div>
+  <footer>
+    © 2025 Новости для Своих
+  </footer>
 
   <script>
-    let allItems = [];
-    let visibleCount = 0;
-    const itemsPerPage = 9;
-
-    function renderItems() {
-      const container = document.getElementById('news-container');
-      container.innerHTML = '';
-      const searchTerm = document.getElementById('search').value.toLowerCase();
-      const now = new Date();
-      const filtered = allItems.filter(item => {
-        const dateStr = item.getAttribute('data-date');
-        if (!dateStr) return false;
-        const itemDate = new Date(dateStr);
-        const diff = (now - itemDate) / (1000 * 60 * 60 * 24);
-        return diff <= 2 && item.textContent.toLowerCase().includes(searchTerm);
-      });
-      const visibleItems = filtered.slice(0, visibleCount);
-      visibleItems.forEach(item => container.appendChild(item));
-      document.getElementById('load-more').style.display = (visibleCount < filtered.length) ? 'block' : 'none';
-    }
-
-    function loadMore() {
-      visibleCount += itemsPerPage;
-      renderItems();
-    }
-
     fetch('/news.html')
-      .then(res => res.text())
+      .then(response => response.text())
       .then(html => {
+        const container = document.getElementById('news-container');
         const temp = document.createElement('div');
         temp.innerHTML = html;
-        allItems = Array.from(temp.querySelectorAll('.news-item'));
-        visibleCount = itemsPerPage;
+
+        const items = Array.from(temp.querySelectorAll('.news-item'));
+        let visibleCount = 9;
+
+        function renderItems() {
+          container.innerHTML = '';
+          items.slice(0, visibleCount).forEach(item => container.appendChild(item));
+          if (visibleCount >= items.length) {
+            document.getElementById('load-more').style.display = 'none';
+          }
+          enableCardEnlargement(); // 👈 обработка клика
+        }
+
+        document.getElementById('load-more').addEventListener('click', () => {
+          visibleCount += 9;
+          renderItems();
+        });
+
         renderItems();
+      })
+      .catch(error => {
+        document.getElementById('news-container').innerHTML = '<p>Не удалось загрузить новости.</p>';
+        console.error('Ошибка загрузки news.html:', error);
       });
 
-    document.getElementById('load-more').addEventListener('click', loadMore);
-    document.getElementById('search').addEventListener('input', () => {
-      visibleCount = itemsPerPage;
-      renderItems();
+    // 🔍 Поиск по сайту
+    document.getElementById('search-box').addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll('.news-item').forEach(item => {
+        item.style.display = item.textContent.toLowerCase().includes(query) ? '' : 'none';
+      });
     });
 
-    document.addEventListener('click', function(e) {
-      const modal = document.getElementById('modal');
-      const modalContent = document.getElementById('modal-content');
-      if (window.innerWidth > 768 && e.target.closest('.news-item')) {
-        const clone = e.target.closest('.news-item').cloneNode(true);
-        modalContent.innerHTML = '';
-        modalContent.appendChild(clone);
-        modal.classList.add('show');
-      }
-      if (e.target === modal) {
-        modal.classList.remove('show');
-      }
-    });
+    // 🖱 Увеличение карточки при клике
+    function enableCardEnlargement() {
+      document.querySelectorAll('.news-item').forEach(item => {
+        item.addEventListener('click', () => {
+          item.classList.toggle('enlarged');
+        });
+      });
+    }
   </script>
 
   <!-- Yandex.Metrika counter -->
   <script type="text/javascript">
-    (function(m,e,t,r,i,k,a){
-        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-        m[i].l=1*new Date();
-        k=e.createElement(t),a=e.get
-  <script type="text/javascript">
-    (function(mElementsByTagName(t)[0],k.async=1,e,t,r,i,k,a){
-       ,k.src=r,a.parent m[i]=m[i]||function(){(m[i].a=m[i].Node.insertBefore(k,a)
-    })(windowa||[]).push(arguments)};
-        m[i]., document, "script", "https://mc.yl=1*new Date();
-        k=e.createandex.ru/metrikaElement(t),a=e.get/tag.js", "ym");
-
-    ym(104596413,ElementsByTagName "init", {
-       (t)[0],k.async=1 clickmap:true,
-,k.src=r,a.parentNode.insertBefore        trackLinks:true,
-        accurate(k,a)
-    })(windowTrackBounce:true, document, "script,
-        webvisor", "https://mc.yandex.ru/metrika:true
-    });
-  </script>
-  <noscript>/tag.js", "ym");
-
-    ym(104596413,<div><img src="https://mc.yandex.ru/watch/104596413" style="position:absolute; left:-9999px;" alt="" /></div></noscript> "init", {
-        clickmap:true,
-
-</body>
-</html>
+      (function(m,e,t,r,i,k,a){
+          m[i]=m[i]function(){(m[i].a=m[i].a[]).push(arguments)};
+          m[i].l=1*new Date();
+          for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+      })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=104600251', 'ym');
