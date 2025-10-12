@@ -31,9 +31,8 @@ def fetch_latest_posts():
     if BOT_MODE == "generate":
         api_id = int(os.getenv("TG_API_ID"))
         api_hash = os.getenv("TG_API_HASH")
-        bot_token = os.getenv("TELEGRAM_TOKEN")
         client = TelegramClient('bot/session', api_id, api_hash)
-        client.start(bot_token=bot_token)
+        client.start()  # использует сохранённую user-сессию
         with client:
             messages = client.get_messages(CHANNEL_ID, limit=30)
             grouped = defaultdict(list)
@@ -43,7 +42,6 @@ def fetch_latest_posts():
             return list(grouped.items())
     else:
         return []
-
 
 def format_post(messages):
     timestamp = datetime.fromtimestamp(messages[0].date.timestamp(), pytz.timezone("Europe/Moscow"))
