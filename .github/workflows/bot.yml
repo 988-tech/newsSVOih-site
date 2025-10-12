@@ -2,8 +2,8 @@ name: Run Telegram Bot
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # запуск каждые 10 минут
-  workflow_dispatch:        # возможность ручного запуска
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
 
 jobs:
   run-bot:
@@ -13,7 +13,7 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
       with:
-        persist-credentials: false  # 🔥 отключает github-actions[bot]
+        persist-credentials: false
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -27,6 +27,7 @@ jobs:
     - name: Run bot
       env:
         TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        BOT_MODE: generate
       run: |
         python bot/bot.py
 
