@@ -44,7 +44,9 @@ def fetch_latest_posts():
     return list(grouped.items())[-30:] if grouped else []
 
 def format_post(messages):
-    html = "<article class='news-item'>\n"
+    timestamp = datetime.fromtimestamp(messages[0].date, pytz.timezone("Europe/Moscow"))
+    date_str = timestamp.strftime('%Y-%m-%d')
+    html = f"<article class='news-item' data-date='{date_str}'>\n"
     caption = ""
     video_shown = False
 
@@ -82,7 +84,6 @@ def format_post(messages):
     if caption:
         html += f"<p>{caption}</p>\n"
 
-    timestamp = datetime.fromtimestamp(messages[0].date, pytz.timezone("Europe/Moscow"))
     html += f"<p class='timestamp'>🕒 {timestamp.strftime('%d.%m.%Y %H:%M')}</p>\n"
     html += f"<a href='https://t.me/{CHANNEL_ID[1:]}/{messages[0].message_id}' target='_blank'>Читать в Telegram</a>\n"
     html += f"<p class='source'>Источник: {messages[0].chat.title}</p>\n"
