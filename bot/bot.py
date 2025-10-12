@@ -279,4 +279,10 @@ def main():
     update_sitemap()
 
 if __name__ == "__main__":
-    bot.polling(none_stop=True)
+    from threading import Thread
+
+    # Запускаем Telegram-бота в отдельном потоке
+    Thread(target=lambda: bot.polling(none_stop=True)).start()
+
+    # Параллельно запускаем генерацию сайта
+    main()
