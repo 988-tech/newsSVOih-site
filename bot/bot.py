@@ -39,22 +39,8 @@ def fetch_latest_posts():
                 grouped[group_id].append(msg)
             return list(grouped.items())
     else:
-        bot.remove_webhook()
-        time.sleep(1)
-        updates = bot.get_updates()
-        posts = [
-            u.channel_post
-            for u in updates
-            if u.channel_post and u.channel_post.chat.username == CHANNEL_ID[1:]
-        ]
-
-        grouped = defaultdict(list)
-        for post in posts:
-            group_id = getattr(post, 'media_group_id', None)
-            key = group_id if group_id else f"single_{post.message_id}"
-            grouped[key].append(post)
-
-        return list(grouped.items())[-30:] if grouped else []
+        # polling-режим: используем telebot
+        return []  # В режиме polling fetch_latest_posts не нужен
 
 def format_post(messages):
     timestamp = datetime.fromtimestamp(messages[0].date.timestamp(), pytz.timezone("Europe/Moscow"))
