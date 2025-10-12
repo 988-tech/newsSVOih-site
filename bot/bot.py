@@ -1,108 +1,43 @@
-import os
-import time
-import telebot
-from datetime import datetime, timedelta
-import pytz
-from collections import defaultdict
+name: Run Telegram Bot
 
-TOKEN = os.getenv("TELEGRAM_TOKEN")
-CHANNEL_ID = "@newsSVOih"
-SEEN_IDS_FILE = "seen_ids.txt"
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # каждые 10 минут
+  workflow_dispatch:
 
-bot = telebot.TeleBot(TOKEN)
+jobs:
+  run-bot:
+    runs-on: ubuntu-22.04  # стабильный образ
 
-def clean_text(text):
-    if not text:
-        return ""
-    text = text.replace("https://t.me/newsSVOih", "").strip()
-    unwanted_phrases = [
-        "💪Подписаться на новости для своих🇷🇺",
-        "Подписаться на новости для своих🇷🇷",
-        "Подписаться на канал",
-        "Читайте нас в Telegram",
-    ]
-    for phrase in unwanted_phrases:
-        text = text.replace(phrase, "")
-    return text.strip()
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+      with:
+        persist-credentials: false
 
-def fetch_latest_posts():
-    bot.remove_webhook()
-    time.sleep(1)
-    updates = bot.get_updates()
-    posts = [
-        u.channel_post
-        for u in updates
-        if u.channel_post and u.channel_post.chat.username == CHANNEL_ID[1:]
-    ]
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-    grouped = defaultdict(list)
-    for post in posts:
-        group_id = getattr(post, 'media_group_id', None)
-        key = group_id if group_id else f"single_{post.message_id}"
-        grouped[key].append(post)
+    - name: Install dependencies
+      run: |
+        pip install -r bot/requirements.txt
 
-    return list(grouped.items())[-30:] if grouped else []
+    - name: Run bot
+      env:
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      run: |
+        echo "Запуск bot.py..."
+        python bot/bot.py || echo "⚠️ bot.py завершился с ошибкой, но workflow продолжается"
 
-def format_post(messages):
-    timestamp = datetime.fromtimestamp(messages[0].date, pytz.timezone("Europe/Moscow"))
-    date_str = timestamp.strftime('%Y-%m-%d')
-    html = f"<article class='news-item' data-date='{date_str}'>\n"
-    caption = ""
-    video_shown = False
-
-    for msg in messages:
-        if msg.content_type == 'photo':
-            try:
-                file_info = bot.get_file(msg.photo[-1].file_id)
-                file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-                html += f"<img src='{file_url}' alt='Фото' />\n"
-            except:
-                html += f"<p>📷 Фото недоступно</p>\n"
-            if msg.caption:
-                caption = clean_text(msg.caption)
-
-        elif msg.content_type == 'video':
-            if msg.caption:
-                caption = clean_text(msg.caption)
-            if not video_shown:
-                try:
-                    file_info = bot.get_file(msg.video.file_id)
-                    file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
-                    html += f"<video controls width='640'>\n"
-                    html += f"  <source src='{file_url}' type='video/mp4'>\n"
-                    html += f"  Ваш браузер не поддерживает видео.\n"
-                    html += f"</video>\n"
-                    video_shown = True
-                except:
-                    html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
-            else:
-                html += f"<p><a href='https://t.me/{CHANNEL_ID[1:]}/{msg.message_id}' target='_blank'>Смотреть видео в Telegram</a></p>\n"
-
-        elif msg.content_type == 'text':
-            caption = clean_text(msg.text)
-
-    if caption:
-        html += f"<p>{caption}</p>\n"
-
-    html += f"<p class='timestamp'>🕒 {timestamp.strftime('%d.%m.%Y %H:%M')}</p>\n"
-    html += f"<a href='https://t.me/{CHANNEL_ID[1:]}/{messages[0].message_id}' target='_blank'>Читать в Telegram</a>\n"
-    html += f"<p class='source'>Источник: {messages[0].chat.title}</p>\n"
-    html += "</article>\n"
-    return html, timestamp
-
-def load_seen_ids():
-    if not os.path.exists(SEEN_IDS_FILE):
-        return set()
-    with open(SEEN_IDS_FILE, "r") as f:
-        return set(line.strip() for line in f)
-
-def save_seen_ids(ids):
-    with open(SEEN_IDS_FILE, "a") as f:
-        for id in ids:
-            f.write(f"{id}\n")
-
-def update_sitemap():
-    today = datetime.now().strftime("%Y-%m-%d")
-    archive_exists = os.path.exists("public/archive.html")
-
-    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
+    - name: Commit updated site files
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}
+        git add public/news.html public/archive.html public/sitemap.xml seen_ids.txt
+        git commit -m "Update site from bot" || echo "No changes"
+        git push
