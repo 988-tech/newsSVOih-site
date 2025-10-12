@@ -270,7 +270,16 @@ def main():
 
 if __name__ == "__main__":
     mode = os.getenv("BOT_MODE", "polling")
+    print("🟡 Запуск bot.py — режим:", mode)
+
     if mode == "polling":
+        print("📲 Запускаем Telegram-бот (polling)")
         bot.polling(none_stop=True)
+
     elif mode == "generate":
-        main()
+        print("⚙️ Запускаем main() — генерация сайта")
+        try:
+            main()
+            print("✅ main() завершён успешно")
+        except Exception as e:
+            print("❌ Ошибка в main():", e)
