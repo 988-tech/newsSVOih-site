@@ -1,69 +1,105 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Segoe UI", Roboto, sans-serif;
-  background: #f0f0f0;
-  color: #222;
-}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Новости для Своих — независимые новости России и мира</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <meta name="yandex-verification" content="3a33e674e5836564">
+  <meta name="description" content="Актуальные новости России и мира без фейков и лишнего шума. Главные события, аналитика, обзоры и факты — коротко и по делу.">
+  <meta name="keywords" content="новости, Telegram, SVOih, события, видео, фото, Россия">
+  <meta name="author" content="SVOih News Team">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <img src="/rf-flag.svg" alt="Флаг России" class="flag-icon" />
+      <div class="text-block">
+        <h1>Новости для Своих</h1>
+        <h2>Честные новости России и мира</h2>
+        <p class="tagline">
+          Актуальные новости России и мира без фейков и лишнего шума.<br>
+          Главные события, аналитика, обзоры и факты — коротко и по делу.<br>
+          Читайте свежие новости, политические и военные сводки, новости экономики, технологий и общества.
+        </p>
+      </div>
+    </div>
+    <div class="search-wrapper">
+      <input type="search" id="search-box" placeholder="Поиск по новостям…" />
+    </div>
+  </header>
 
-header {
-  background: linear-gradient(135deg, #556B2F, #3C3B32);
-  color: white;
-  text-align: center;
-  padding: 2rem 1rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
+  <main>
+    <a href="https://t.me/newsSVOih" class="button" target="_blank">Перейти в Telegram-канал</a>
+    <a href="archive.html" class="button">Архив</a>
 
-h1 {
-  font-size: 2.4rem;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
+    <section id="news-feed">
+      <h3>Последние новости</h3>
+      <div id="news-container" class="news-grid"></div>
+      <button id="load-more" class="button">Показать ещё</button>
+    </section>
+  </main>
 
-h2 {
-  font-size: 1.4rem;
-  font-weight: normal;
-  color: #d8e0d8;
-}
+  <footer>
+    © 2025 Новости для Своих
+  </footer>
 
-main {
-  max-width: 1000px;
-  margin: 3rem auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+  <script>
+    fetch('/news.html')
+      .then(response => response.text())
+      .then(html => {
+        const container = document.getElementById('news-container');
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
 
-.news-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
-}
+        const items = Array.from(temp.querySelectorAll('.news-item'));
+        let visibleCount = 9;
 
-.news-item {
-  background-color: #f9f9f9;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
-}
+        function renderItems() {
+          container.innerHTML = '';
+          items.slice(0, visibleCount).forEach(item => container.appendChild(item));
+          if (visibleCount >= items.length) {
+            document.getElementById('load-more').style.display = 'none';
+          }
+          enableCardEnlargement();
+        }
 
-.news-item.enlarged {
-  transform: scale(1.05);
-  z-index: 10;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-}
+        document.getElementById('load-more').addEventListener('click', () => {
+          visibleCount += 9;
+          renderItems();
+        });
 
-#search-box {
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-  width: 80%;
-  max-width: 400px;
-  margin: 1rem auto;
-  display: block;
-}
+        renderItems();
+      })
+      .catch(error => {
+        document.getElementById('news-container').innerHTML = '<p>Не удалось загрузить новости.</p>';
+        console.error('Ошибка загрузки news.html:', error);
+      });
+
+    document.getElementById('search-box').addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll('.news-item').forEach(item => {
+        item.style.display = item.textContent.toLowerCase().includes(query) ? '' : 'none';
+      });
+    });
+
+    function enableCardEnlargement() {
+      document.querySelectorAll('.news-item').forEach(item => {
+        item.addEventListener('click', () => {
+          item.classList.toggle('enlarged');
+        });
+      });
+    }
+  </script>
+
+  <script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]function(){(m[i].a=m[i].a[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=104600251', 'ym');
+  </script>
+</body>
+</html>
